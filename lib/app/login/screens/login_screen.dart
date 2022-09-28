@@ -6,7 +6,7 @@ import 'package:firebase_chat_example/app/sign_up/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../widgets/common_dialog.dart';
+import '../../../components/common_dialog.dart';
 import '../../home/screens/home_screen.dart';
 import '../controllers/login_controller.dart';
 

@@ -1,3 +1,5 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_chat_example/app/home/bindings/home_binding.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -13,6 +15,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await FirebaseAppCheck.instance.activate();
   FlutterNativeSplash.remove();
   runApp(const App());
 }
@@ -27,6 +30,7 @@ class App extends StatelessWidget {
       theme: lightTheme,
       darkTheme: darkTheme,
       home: LoginScreen(),
+      initialBinding: HomeBinding(),
     );
   }
 }

@@ -63,6 +63,7 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    namespace 'me.tnfy10.firebase_chat_example'
 }
 
 flutter {
