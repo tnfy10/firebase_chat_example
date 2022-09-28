@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:211462705969:android:c100c701ebebaa94529610",
+        "mobilesdk_app_id": "1:211462705969:android:c2ffa056c6bf5708529610",
         "android_client_info": {
           "package_name": "me.tnfy10.firebase_chat_example"
         }

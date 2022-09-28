@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import '../controllers/sign_up_controller.dart';
 
 class InputEmailScreen extends StatelessWidget {
-  InputEmailScreen({super.key});
+  final SignUpController signUpController;
 
-  final signUpController = Get.find<SignUpController>();
+  const InputEmailScreen({super.key, required this.signUpController});
 
   @override
   Widget build(BuildContext context) {
@@ -15,24 +15,24 @@ class InputEmailScreen extends StatelessWidget {
       child: Column(
         children: [
           const Text(
-              '이메일을 입력하세요.',
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 15
-            ),
+            '이메일을 입력하세요.',
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
           ),
           const SizedBox(height: 30),
-          TextField(
-              onChanged: ((value) {
-                signUpController.email.value = value;
-              }),
-              decoration: InputDecoration(
-                  labelText: '이메일',
-                  border: const OutlineInputBorder(),
-                  errorText: signUpController.isValidEmail.value
-                      ? null
-                      : signUpController.emailErrorMsg),
-              keyboardType: TextInputType.emailAddress)
+          Obx(
+            () => TextFormField(
+                initialValue: signUpController.email.value,
+                onChanged: ((value) {
+                  signUpController.email.value = value;
+                }),
+                decoration: InputDecoration(
+                    labelText: '이메일',
+                    border: const OutlineInputBorder(),
+                    errorText: signUpController.isValidEmail.value
+                        ? null
+                        : signUpController.emailErrorMsg.value),
+                keyboardType: TextInputType.emailAddress),
+          )
         ],
       ),
     );

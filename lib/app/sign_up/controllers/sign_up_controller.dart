@@ -1,12 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
-import '../screens/input_email_widget.dart';
-import '../screens/input_nickname_widget.dart';
-import '../screens/input_password_widget.dart';
-
 class SignUpController extends GetxController {
+  final _usersCollection = "users";
+
   RxString email = "".obs;
   RxString password1 = "".obs;
   RxString password2 = "".obs;
@@ -20,100 +18,128 @@ class SignUpController extends GetxController {
 
   RxBool isLoading = false.obs;
 
-  String? emailErrorMsg;
-  String? password1ErrorMsg;
-  String? password2ErrorMsg;
-  String? nicknameErrorMsg;
-
-  final List<Widget> screens = [
-    InputEmailScreen(),
-    InputPasswordWidget(),
-    InputNicknameWidget()
-  ];
+  RxString emailErrorMsg = "".obs;
+  RxString password1ErrorMsg = "".obs;
+  RxString password2ErrorMsg = "".obs;
+  RxString nicknameErrorMsg = "".obs;
 
   var firebaseAuth = FirebaseAuth.instance;
+  var db = FirebaseFirestore.instance;
 
-  void _checkValidEmail() {
+  Future<void> _checkValidEmail() async {
     if (email.value.isEmpty) {
-      emailErrorMsg = "이메일을 입력해주세요";
+      emailErrorMsg.value = "이메일을 입력해주세요";
       isValidEmail.value = false;
       return;
     }
 
     var regExp = RegExp(
         r"^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$");
-    if (regExp.hasMatch(email.value)) {
-      emailErrorMsg = "이메일이 올바르지 않습니다.";
+    if (!regExp.hasMatch(email.value)) {
+      emailErrorMsg.value = "이메일이 올바르지 않습니다.";
       isValidEmail.value = false;
       return;
     }
 
-    emailErrorMsg = null;
+    var ref = await db
+        .collection(_usersCollection)
+        .where("email", isEqualTo: email.value)
+        .get();
+    if (ref.size != 0) {
+      emailErrorMsg.value = "이미 존재하는 이메일 입니다.";
+      isValidEmail.value = false;
+      return;
+    }
+
     isValidEmail.value = true;
   }
 
   bool _checkValidPassword() {
-    if (password1.value
-        .trim()
-        .isEmpty) {
-      password1ErrorMsg = "비밀번호를 입력해주세요.";
+    if (password1.value.trim().isEmpty || password2.value.trim().isEmpty) {
+      if (password1.value.trim().isEmpty) {
+        password1ErrorMsg.value = "비밀번호를 입력해주세요.";
+        isValidPassword1.value = false;
+      } else {
+        isValidPassword1.value = true;
+      }
+      if (password2.value.trim().isEmpty) {
+        password2ErrorMsg.value = "비밀번호를 입력해주세요.";
+        isValidPassword2.value = false;
+      } else {
+        isValidPassword2.value = true;
+      }
+      return false;
+    }
+
+    if (password1.value.trim() != password2.value.trim()) {
+      password1ErrorMsg.value = "";
+      password2ErrorMsg.value = "비밀번호가 일치하지 않습니다.";
       isValidPassword1.value = false;
-    } else {
-      password1ErrorMsg = null;
-      isValidPassword1.value = true;
-    }
-
-    if (password2.value
-        .trim()
-        .isEmpty) {
-      password2ErrorMsg = "비밀번호 확인을 입력해주세요.";
       isValidPassword2.value = false;
-    } else {
-      password2ErrorMsg = null;
-      isValidPassword2.value = true;
+      return false;
     }
 
-    if (password1.value.trim() == password2.value.trim()) {
-      password1ErrorMsg = null;
-      password2ErrorMsg = null;
-      isValidPassword1.value = true;
-      isValidPassword2.value = true;
-      return true;
+    if (password2.value.length < 6) {
+      password1ErrorMsg.value = "";
+      password2ErrorMsg.value = "비밀번호가 최소 6자 이상이 되어야 합니다.";
+      isValidPassword1.value = false;
+      isValidPassword2.value = false;
+      return false;
     }
 
-    return false;
+    isValidPassword1.value = true;
+    isValidPassword2.value = true;
+
+    return true;
   }
 
-  void _checkValidNickname() {
+  Future<void> _checkValidNickname() async {
     if (nickname.value.isEmpty) {
       isValidNickname.value = false;
-      nicknameErrorMsg = "닉네임을 입력해주세요";
+      nicknameErrorMsg.value = "닉네임을 입력해주세요";
+      return;
+    }
+
+    var ref = await db
+        .collection(_usersCollection)
+        .where("nickname", isEqualTo: nickname.value)
+        .get();
+    if (ref.size != 0) {
+      nicknameErrorMsg.value = "이미 존재하는 닉네임 입니다.";
+      isValidNickname.value = false;
+      return;
     }
 
     isValidNickname.value = true;
-    nicknameErrorMsg = null;
   }
 
-  bool checkValidField() {
+  Future<bool> checkValidField() async {
     switch (currentWidgetIdx.value) {
       case 0:
-        _checkValidEmail();
+        await _checkValidEmail();
         return isValidEmail.value;
       case 1:
         return _checkValidPassword();
       case 2:
-        _checkValidNickname();
+        await _checkValidNickname();
         return isValidNickname.value;
       default:
-        throw RangeError.index(currentWidgetIdx.value, screens);
+        throw RangeError.index(currentWidgetIdx.value, 3);
     }
   }
 
-  void createAccount() async {
+  Future<void> createAccount() async {
     isLoading.value = true;
     var userCredential = await firebaseAuth.createUserWithEmailAndPassword(
         email: email.value, password: password1.value);
-    await userCredential.user?.updateDisplayName(nickname.value);
-    isLoading.value = false;
+    var userData = {
+      "uid": userCredential.user?.uid,
+      "email": userCredential.user?.email,
+      "nickname": nickname.value
+    };
+    await db
+        .collection(_usersCollection)
+        .doc()
+        .set(userData, SetOptions(merge: true));
   }
 }

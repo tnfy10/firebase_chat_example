@@ -102,7 +102,7 @@ class LoginScreen extends StatelessWidget with CommonDialog {
                         )),
                         TextButton(
                           onPressed: () {
-                            Get.to(() => FindPasswordScreen(),
+                            Get.to(() => const FindPasswordScreen(),
                                 binding: FindPasswordBinding());
                           },
                           child: const Text("비밀번호를 잊으셨나요?"),
@@ -129,7 +129,7 @@ class LoginScreen extends StatelessWidget with CommonDialog {
   void _loginButton(BuildContext context) {
     FocusManager.instance.primaryFocus?.unfocus();
     loginController.fetchLogin().then((_) {
-      Get.off(() => HomeScreen(), binding: HomeBinding());
+      Get.off(() => const HomeScreen(), binding: HomeBinding());
       Get.delete<LoginController>();
     }).catchError((e) {
       showOneButtonDialog(
