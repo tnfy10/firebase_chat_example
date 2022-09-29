@@ -1,5 +1,4 @@
-import 'package:firebase_chat_example/app/find_password/bindings/find_password_binding.dart';
-import 'package:firebase_chat_example/app/find_password/screens/find_password_screen.dart';
+import 'package:firebase_chat_example/app/login/screens/find_password_screen.dart';
 import 'package:firebase_chat_example/app/home/bindings/home_binding.dart';
 import 'package:firebase_chat_example/app/sign_up/bindings/sign_up_binding.dart';
 import 'package:firebase_chat_example/app/sign_up/screens/sign_up_screen.dart';
@@ -102,8 +101,7 @@ class LoginScreen extends StatelessWidget with CommonDialog {
                         )),
                         TextButton(
                           onPressed: () {
-                            Get.to(() => const FindPasswordScreen(),
-                                binding: FindPasswordBinding());
+                            Get.to(() => FindPasswordScreen());
                           },
                           child: const Text("비밀번호를 잊으셨나요?"),
                         )
