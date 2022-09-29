@@ -13,6 +13,7 @@ class FindPasswordScreen extends StatelessWidget with CommonDialog {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: const Text('비밀번호 재설정'),
         centerTitle: true,

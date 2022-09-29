@@ -20,6 +20,7 @@ dependencies:
   flutter_native_splash: ^2.2.9
   firebase_app_check: ^0.0.7+2
   cloud_firestore: ^3.4.9
+  persistent_bottom_nav_bar: ^5.0.2
 
 dev_dependencies:
   flutter_test:

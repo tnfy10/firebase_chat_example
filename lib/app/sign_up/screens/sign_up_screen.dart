@@ -39,6 +39,7 @@ class SignUpScreen extends StatelessWidget with CommonDialog {
         () => IgnorePointer(
           ignoring: signUpController.isLoading.value,
           child: Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.background,
               appBar: AppBar(
                 title: const Text('회원가입'),
                 centerTitle: true,
@@ -54,7 +55,7 @@ class SignUpScreen extends StatelessWidget with CommonDialog {
                       signUpController.currentWidgetIdx.value--;
                     }
                   },
-                  icon: const Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back_ios),
                 ),
               ),
               body: Stack(

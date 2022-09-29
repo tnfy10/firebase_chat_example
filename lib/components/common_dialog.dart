@@ -17,6 +17,7 @@ mixin CommonDialog {
               return allowBackButton;
             },
             child: AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.background,
               title: Text(
                 title,
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
