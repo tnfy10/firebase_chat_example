@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_chat_example/const/firestore_collection.dart';
 import 'package:get/get.dart';
 
-class SignUpController extends GetxController {
-  final _usersCollection = "users";
+import '../../home/model/member.dart';
 
+class SignUpController extends GetxController {
   RxString email = "".obs;
   RxString password1 = "".obs;
   RxString password2 = "".obs;
@@ -23,8 +24,8 @@ class SignUpController extends GetxController {
   RxString password2ErrorMsg = "".obs;
   RxString nicknameErrorMsg = "".obs;
 
-  var firebaseAuth = FirebaseAuth.instance;
-  var db = FirebaseFirestore.instance;
+  final firebaseAuth = FirebaseAuth.instance;
+  final db = FirebaseFirestore.instance;
 
   Future<void> _checkValidEmail() async {
     if (email.value.isEmpty) {
@@ -33,7 +34,7 @@ class SignUpController extends GetxController {
       return;
     }
 
-    var regExp = RegExp(
+    final regExp = RegExp(
         r"^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$");
     if (!regExp.hasMatch(email.value)) {
       emailErrorMsg.value = "이메일이 올바르지 않습니다.";
@@ -41,8 +42,8 @@ class SignUpController extends GetxController {
       return;
     }
 
-    var ref = await db
-        .collection(_usersCollection)
+    final ref = await db
+        .collection(FirestoreCollection.member)
         .where("email", isEqualTo: email.value)
         .get();
     if (ref.size != 0) {
@@ -100,8 +101,8 @@ class SignUpController extends GetxController {
       return;
     }
 
-    var ref = await db
-        .collection(_usersCollection)
+    final ref = await db
+        .collection(FirestoreCollection.member)
         .where("nickname", isEqualTo: nickname.value)
         .get();
     if (ref.size != 0) {
@@ -130,16 +131,18 @@ class SignUpController extends GetxController {
 
   Future<void> createAccount() async {
     isLoading.value = true;
-    var userCredential = await firebaseAuth.createUserWithEmailAndPassword(
+    final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
         email: email.value, password: password1.value);
-    var userData = {
-      "uid": userCredential.user?.uid,
-      "email": userCredential.user?.email,
-      "nickname": nickname.value
-    };
+    final member = Member(
+        email: email.value,
+        nickname: nickname.value,
+        profileImg: "",
+        statusMessage: "",
+        friendUidList: []);
+
     await db
-        .collection(_usersCollection)
-        .doc()
-        .set(userData, SetOptions(merge: true));
+        .collection(FirestoreCollection.member)
+        .doc(userCredential.user?.uid)
+        .set(member.toFirestore(), SetOptions(merge: true));
   }
 }

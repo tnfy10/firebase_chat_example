@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../const/prefs_key.dart';
 
 class LoginController extends GetxController {
   String email = "";
@@ -8,7 +11,7 @@ class LoginController extends GetxController {
   RxBool isPasswordVisible = false.obs;
   RxBool isLoading = false.obs;
 
-  var firebaseAuth = FirebaseAuth.instance;
+  final firebaseAuth = FirebaseAuth.instance;
 
   void changePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;
@@ -18,8 +21,13 @@ class LoginController extends GetxController {
     isLoading.value = true;
 
     try {
-      await firebaseAuth.signInWithEmailAndPassword(
+      final userCredential = await firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password.value);
+      final prefs = await SharedPreferences.getInstance();
+      final uid = userCredential.user?.uid;
+      if (uid != null) {
+        prefs.setString(uidKey, uid);
+      }
     } on FirebaseAuthException catch (e) {
       return Future.error(e);
     } finally {

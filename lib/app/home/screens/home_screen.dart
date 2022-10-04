@@ -1,13 +1,26 @@
 import 'package:firebase_chat_example/app/home/controllers/bottom_nav_controller.dart';
+import 'package:firebase_chat_example/app/home/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
+  @override
+  State<StatefulWidget> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final userController = Get.find<UserController>();
   final bottomNavController = Get.find<BottomNavController>();
   final _tabViewController = PersistentTabController(initialIndex: 0);
+
+  @override
+  void initState() {
+    super.initState();
+    userController.initDataLoad();
+  }
 
   List<PersistentBottomNavBarItem> bottomNavBarItemList(BuildContext context) =>
       [

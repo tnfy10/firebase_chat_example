@@ -6,9 +6,9 @@ import 'package:get/get.dart';
 
 class BottomNavController extends GetxController {
   final List<Widget> screens = [
-    FriendListScreen(),
-    ChatRoomListScreen(),
-    MoreScreen()
+    const FriendListScreen(),
+    const ChatRoomListScreen(),
+    const MoreScreen()
   ];
 
   int currentScreenIdx = 0;

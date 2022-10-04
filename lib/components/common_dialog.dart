@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 mixin CommonDialog {
   void showOneButtonDialog(
@@ -20,7 +21,8 @@ mixin CommonDialog {
               backgroundColor: Theme.of(context).colorScheme.background,
               title: Text(
                 title,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
               content: Text(content),
               actions: [
@@ -30,5 +32,40 @@ mixin CommonDialog {
           );
         },
         barrierDismissible: barrierDismissible);
+  }
+
+  void showTextFormFieldDialog(
+      {required BuildContext context,
+      required String title,
+      TextEditingController? controller,
+      ValueChanged<String>? onChanged,
+      required String labelText,
+      String? errorText,
+      TextInputType keyboardType = TextInputType.text,
+      required VoidCallback onPressed,
+      required String buttonText}) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.background,
+            title: Text(
+              title,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            ),
+            content: TextFormField(
+                controller: controller,
+                onChanged: onChanged,
+                decoration: InputDecoration(
+                    labelText: labelText,
+                    border: const OutlineInputBorder(),
+                    errorText: errorText),
+                keyboardType: keyboardType),
+            actions: [
+              TextButton(onPressed: () => Get.back(), child: const Text('취소')),
+              TextButton(onPressed: onPressed, child: Text(buttonText))
+            ],
+          );
+        });
   }
 }

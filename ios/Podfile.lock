@@ -614,11 +614,6 @@ PODS:
   - Firebase/Firestore (9.5.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 9.5.0)
-  - firebase_app_check (0.0.7-2):
-    - Firebase/CoreOnly (~> 9.5.0)
-    - firebase_core
-    - FirebaseAppCheck (~> 9.5.0-beta)
-    - Flutter
   - firebase_auth (3.9.0):
     - Firebase/Auth (= 9.5.0)
     - firebase_core
@@ -626,10 +621,6 @@ PODS:
   - firebase_core (1.22.0):
     - Firebase/CoreOnly (= 9.5.0)
     - Flutter
-  - FirebaseAppCheck (9.5.0):
-    - FirebaseCore (~> 9.0)
-    - GoogleUtilities/Environment (~> 7.7)
-    - PromisesObjC (~> 2.1)
   - FirebaseAuth (9.5.0):
     - FirebaseCore (~> 9.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 7.7)
@@ -747,21 +738,22 @@ PODS:
   - nanopb/decode (2.30909.0)
   - nanopb/encode (2.30909.0)
   - PromisesObjC (2.1.1)
+  - shared_preferences_ios (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
-  - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
+  - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
 
 SPEC REPOS:
   trunk:
     - abseil
     - BoringSSL-GRPC
     - Firebase
-    - FirebaseAppCheck
     - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreDiagnostics
@@ -780,8 +772,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
-  firebase_app_check:
-    :path: ".symlinks/plugins/firebase_app_check/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
@@ -790,16 +780,16 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
+  shared_preferences_ios:
+    :path: ".symlinks/plugins/shared_preferences_ios/ios"
 
 SPEC CHECKSUMS:
   abseil: ebe5b5529fb05d93a8bdb7951607be08b7fa71bc
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   cloud_firestore: bed9432d72bb357aa33e864fd4d5b7c2f0e098d0
   Firebase: 800f16f07af493d98d017446a315c27af0552f41
-  firebase_app_check: 00336ed1015e2a8ec53c8cf0c5d4ee3e83981a1d
   firebase_auth: c070c7e5b66037cddb73a68ca4bf4728b063680b
   firebase_core: 31872a49ffe0bf6f834e7044c7334e433536735a
-  FirebaseAppCheck: 84e58ced2b43249bb75529da1c33193b71e9c3c6
   FirebaseAuth: 741918f1fa62ed23246a509279f91d42d79a713f
   FirebaseCore: 25c0400b670fd1e2f2104349cd3b5dcce8d9418f
   FirebaseCoreDiagnostics: 99a495094b10a57eeb3ae8efa1665700ad0bdaa6
@@ -816,6 +806,7 @@ SPEC CHECKSUMS:
   Libuv-gRPC: 55e51798e14ef436ad9bc45d12d43b77b49df378
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
+  shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
 
 PODFILE CHECKSUM: 7368163408c647b7eb699d0d788ba6718e18fb8d
 
