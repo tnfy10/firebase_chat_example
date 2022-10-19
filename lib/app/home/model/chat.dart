@@ -21,30 +21,35 @@ enum SendKind {
 }
 
 class Chat {
+  final String? roomCode;
   final String? senderUid;
-  final String? sendDateTime;
+  final int? sendMillisecondEpoch;
   final String? text;
   final SendKind? kind;
 
   Chat(
-      {required this.senderUid,
-      required this.sendDateTime,
+      {required this.roomCode,
+      required this.senderUid,
+      required this.sendMillisecondEpoch,
       required this.text,
       required this.kind});
 
   factory Chat.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     final data = snapshot.data();
     return Chat(
+        roomCode: data?['roomCode'],
         senderUid: data?['senderUid'],
-        sendDateTime: data?['sendDateTime'],
+        sendMillisecondEpoch: data?['sendMillisecondEpoch'],
         text: data?['text'],
-        kind: SendKind.fromString(data?['kind']));
+        kind: SendKind.fromString(data?['kind'] ?? "message"));
   }
 
   Map<String, dynamic> toFirestore() => {
-        "senderUid": senderUid,
-        "sendDateTime": sendDateTime,
-        "text": text,
-        "kind": describeEnum(kind!)
+        if (roomCode != null) "roomCode": roomCode,
+        if (senderUid != null) "senderUid": senderUid,
+        if (sendMillisecondEpoch != null)
+          "sendMillisecondEpoch": sendMillisecondEpoch,
+        if (text != null) "text": text,
+        if (kind != null) "kind": describeEnum(kind!)
       };
 }

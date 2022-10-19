@@ -1,4 +1,5 @@
 import 'package:firebase_chat_example/app/home/controllers/chat_controller.dart';
+import 'package:firebase_chat_example/app/home/controllers/chat_room_controller.dart';
 import 'package:firebase_chat_example/app/home/controllers/user_controller.dart';
 import 'package:firebase_chat_example/app/home/screens/chat_room_screen.dart';
 import 'package:firebase_chat_example/components/common_dialog.dart';
@@ -11,7 +12,7 @@ class FriendListScreen extends StatelessWidget with CommonDialog {
   @override
   Widget build(BuildContext context) {
     final userController = Get.find<UserController>();
-    final chatController = Get.find<ChatController>();
+    final chatRoomController = Get.find<ChatRoomController>();
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -59,9 +60,15 @@ class FriendListScreen extends StatelessWidget with CommonDialog {
                   child: InkWell(
                     borderRadius: const BorderRadius.all(Radius.circular(12)),
                     onTap: () {
-                      // TODO: 해당 유저 클릭하면 해당 유저와의 1대1 채팅방 생성 후 입장 또는 기존 채팅방 입장
-                      Get.to(
-                          () => ChatRoomScreen(chatController: chatController));
+                      chatRoomController
+                          .startOneOnOneChat(
+                              userController.friendList[index].email!)
+                          .then((_) {
+                        Get.to(() => const ChatRoomScreen(),
+                            binding: BindingsBuilder(() {
+                          Get.put(ChatController());
+                        }));
+                      });
                     },
                     child: ListTile(
                       leading: Image.network(

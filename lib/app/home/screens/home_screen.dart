@@ -1,8 +1,11 @@
 import 'package:firebase_chat_example/app/home/controllers/bottom_nav_controller.dart';
+import 'package:firebase_chat_example/app/home/controllers/chat_room_controller.dart';
 import 'package:firebase_chat_example/app/home/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+
+import '../controllers/chat_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
