@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_example/const/firestore_collection.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:uuid/uuid.dart';
@@ -11,32 +12,39 @@ class ChatRoomController extends GetxController {
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
 
+  final memberList = <Member>[];
   Map<String, String?> memberProfileImgMap = {};
   RxBool isLoading = false.obs;
 
-  String? chatRoomId;
+  String? roomCode;
 
   Future<void> startOneOnOneChat(String email) async {
+    memberList.clear();
     if (auth.currentUser?.uid == null) {
       return Future.error(
           "ChatController::getChatRoomList::Current User uid is null.");
     }
 
-    final memberRef = await db.collection(FirestoreCollection.member).where("email", isEqualTo: email).get();
+    final memberRef = await db
+        .collection(FirestoreCollection.member)
+        .where("email", isEqualTo: email)
+        .get();
 
     if (memberRef.docs.isEmpty) {
-      return Future.error(
-          "ChatController::getChatRoomList::User not found");
+      return Future.error("ChatController::getChatRoomList::User not found");
     }
 
     final friendUid = memberRef.docs[0].id;
+    final uidList = [auth.currentUser!.uid, friendUid];
+
+    memberList.add(Member.fromFirestore(memberRef.docs[0]));
 
     final chatRoomRef = await db
         .collection(FirestoreCollection.chatRoom)
-        .where("uidList", whereIn: [auth.currentUser!.uid, friendUid]).get();
+        .where("uidList", arrayContainsAny: uidList).get();
 
     if (chatRoomRef.docs.isNotEmpty) {
-      chatRoomId = chatRoomRef.docs[0].id;
+      roomCode = chatRoomRef.docs[0].id;
       await _fetchMemberProfileImg();
       return;
     }
@@ -61,14 +69,15 @@ class ChatRoomController extends GetxController {
         .doc(uuid)
         .set(data, SetOptions(merge: true));
 
-    chatRoomId = uuid;
+    roomCode = uuid;
     await _fetchMemberProfileImg();
   }
 
   Future<void> _fetchMemberProfileImg() async {
     memberProfileImgMap.clear();
 
-    final chatRoomData = await db.collection(FirestoreCollection.chatRoom).doc(chatRoomId).get();
+    final chatRoomData =
+        await db.collection(FirestoreCollection.chatRoom).doc(roomCode).get();
     final uidList = chatRoomData.data()!["uidList"];
 
     for (var uid in uidList) {

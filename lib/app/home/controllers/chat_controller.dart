@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../model/chat.dart';
+import 'chat_room_controller.dart';
 
 class ChatController extends GetxController {
   final auth = FirebaseAuth.instance;
@@ -13,26 +14,26 @@ class ChatController extends GetxController {
   RxList<Chat> chatList = <Chat>[].obs;
   RxBool isLoading = false.obs;
 
-  void receiveChatMessage(String roomCode) {
-    final docRef = db.collection(FirestoreCollection.chat).where(
-        "roomCode", isEqualTo: roomCode).get();
-    // .listen(
-    //   (event) {
-    //     final chat = Chat.fromFirestore(event);
-    //     chatList.add(chat);
-    //   },
-    //   onError: (error) => debugPrint(
-    //       "ChatController::receiveChatMessage::Chat Message Listen failed: $error"),
-    // );
+  @override
+  void onInit() {
+    super.onInit();
+    final chatRoomController = Get.find<ChatRoomController>();
+    receiveChatMessage(chatRoomController.roomCode ?? "");
   }
 
-  Future<void> fetchChatHistory(String roomCode) async {
-    final docRef = await db.collection(FirestoreCollection.chat).where(
-        "roomCode", isEqualTo: roomCode).orderBy("sendMillisecondEpoch").get();
-    
-    for (var doc in docRef.docs) {
-      chatList.add(Chat.fromFirestore(doc));
-    }
+  void receiveChatMessage(String roomCode) {
+    db
+        .collection(FirestoreCollection.chat)
+        .where("roomCode", isEqualTo: roomCode)
+        .orderBy("sendMillisecondEpoch")
+        .snapshots()
+        .listen((event) {
+      for (var change in event.docChanges) {
+        if (change.type == DocumentChangeType.added) {
+          chatList.add(Chat.fromFirestore(change.doc));
+        }
+      }
+    });
   }
 
   Future<void> sendMessage(String roomCode, String msg) async {
@@ -43,14 +44,10 @@ class ChatController extends GetxController {
     final chat = Chat(
         roomCode: roomCode,
         senderUid: auth.currentUser?.uid,
-        sendMillisecondEpoch: DateTime
-            .now()
-            .millisecondsSinceEpoch,
+        sendMillisecondEpoch: DateTime.now().millisecondsSinceEpoch,
         text: msg,
         kind: SendKind.message);
 
     await db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore());
-
-    chatList.add(chat);
   }
 }

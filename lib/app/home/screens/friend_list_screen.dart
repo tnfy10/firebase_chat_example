@@ -29,8 +29,7 @@ class FriendListScreen extends StatelessWidget with CommonDialog {
                     controller: emailController,
                     labelText: "이메일",
                     onPressed: () async {
-                      bool result =
-                          await userController.addFriend(emailController.text);
+                      bool result = await userController.addFriend(emailController.text);
                       if (result) {
                         Get.back();
                         showOneButtonDialog(
@@ -61,25 +60,25 @@ class FriendListScreen extends StatelessWidget with CommonDialog {
                     borderRadius: const BorderRadius.all(Radius.circular(12)),
                     onTap: () {
                       chatRoomController
-                          .startOneOnOneChat(
-                              userController.friendList[index].email!)
+                          .startOneOnOneChat(userController.friendList[index].email!)
                           .then((_) {
-                        Get.to(() => const ChatRoomScreen(),
-                            binding: BindingsBuilder(() {
+                        Get.to(() => ChatRoomScreen(), binding: BindingsBuilder(() {
                           Get.put(ChatController());
                         }));
                       });
                     },
                     child: ListTile(
-                      leading: Image.network(
-                          userController.friendList[index].profileImg ?? "",
+                      leading: Image.network(userController.friendList[index].profileImg ?? "",
                           width: 56,
                           height: 56,
-                          fit: BoxFit.cover),
-                      title:
-                          Text(userController.friendList[index].nickname ?? ""),
-                      subtitle: Text(
-                          userController.friendList[index].statusMessage ?? ""),
+                          fit: BoxFit.cover, loadingBuilder: (context, _, __) {
+                        return const SizedBox(
+                            width: 56, height: 56, child: CircularProgressIndicator());
+                      }, errorBuilder: (_, __, ___) {
+                        return const Icon(Icons.account_circle, size: 56);
+                      }),
+                      title: Text(userController.friendList[index].nickname ?? ""),
+                      subtitle: Text(userController.friendList[index].statusMessage ?? ""),
                     ),
                   ),
                 );
