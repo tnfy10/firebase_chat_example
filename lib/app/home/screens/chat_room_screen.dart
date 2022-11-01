@@ -84,7 +84,7 @@ class ChatRoomScreen extends StatelessWidget {
                                                   padding: const EdgeInsets.only(bottom: 5),
                                                   child: Text(
                                                       chatRoomController.memberList[0].nickname ??
-                                                          "dd"),
+                                                          ''),
                                                 ),
                                           ChatBubble(
                                               text: chatController.chatList[index].text ?? "",

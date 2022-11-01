@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="me.tnfy10.firebase_chat_example">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
