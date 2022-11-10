@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_example/app/login/bindings/login_binding.dart';
 import 'package:firebase_chat_example/app/login/screens/login_screen.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../const/firestore_collection.dart';
 import '../model/member.dart';
@@ -12,7 +17,7 @@ class UserController extends GetxController {
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
 
-  Member? member;
+  Rx<Member> member = Member().obs;
 
   RxList<Member> friendList = <Member>[].obs;
   RxBool isLoading = false.obs;
@@ -21,7 +26,13 @@ class UserController extends GetxController {
 
   var errMsg = "";
 
-  void initDataLoad() async {
+  @override
+  void onInit() {
+    super.onInit();
+    initData();
+  }
+
+  void initData() async {
     isLoading.value = true;
     await getMemberData();
     await getFriendList();
@@ -33,7 +44,8 @@ class UserController extends GetxController {
       final docRef =
           db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
       final doc = await docRef.get();
-      member = Member.fromFirestore(doc);
+      member.value = Member.fromFirestore(doc);
+      member.refresh();
     } catch (e) {
       debugPrint("UserController::getMemberData:member 데이터 로드 에러");
       debugPrint("UserController::getMemberData:${e.toString()}");
@@ -46,7 +58,7 @@ class UserController extends GetxController {
   Future<void> getFriendList() async {
     List<Member> tempList = [];
     try {
-      for (final uid in member?.friendUidList ?? []) {
+      for (final uid in member.value.friendUidList ?? []) {
         final docRef = db.collection(FirestoreCollection.member).doc(uid);
         final doc = await docRef.get();
         tempList.add(Member.fromFirestore(doc));
@@ -77,7 +89,7 @@ class UserController extends GetxController {
 
     final friendUid = friendRef.docs[0].reference.id;
 
-    if (member?.friendUidList?.contains(friendUid) ?? true) {
+    if (member.value.friendUidList?.contains(friendUid) ?? true) {
       errMsg = "이미 추가된 사용자입니다.";
       return false;
     }
@@ -91,5 +103,31 @@ class UserController extends GetxController {
     await getFriendList();
 
     return true;
+  }
+
+  Future<void> updateProfileImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      final storageRef = FirebaseStorage.instance.ref();
+
+      if (image?.path == null) {
+        return Future.error('UserController::updateProfileImage::이미지 경로가 null임.');
+      }
+
+      final imageRef = storageRef.child(image!.path);
+      File file = File(image.path);
+      await imageRef.putFile(file);
+      final imgUrl = await imageRef.getDownloadURL();
+      final memberRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
+      await memberRef.update({'profileImg': imgUrl});
+      getMemberData();
+    } catch (e) {
+      return Future.error('UserController::updateProfileImage::error:${e.toString()}');
+    }
+  }
+
+  Future<void> updateNickname() async {
+
   }
 }

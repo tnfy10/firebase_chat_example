@@ -45,7 +45,7 @@ class App extends StatelessWidget {
     }
 
     if (FirebaseAuth.instance.currentUser?.uid == uid) {
-      return const HomeScreen();
+      return HomeScreen();
     } else {
       return LoginScreen();
     }

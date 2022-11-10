@@ -8,11 +8,11 @@ class Member {
   final List<String>? friendUidList;
 
   Member(
-      {required this.email,
-      required this.nickname,
-      required this.profileImg,
-      required this.statusMessage,
-      required this.friendUidList});
+      {this.email,
+      this.nickname,
+      this.profileImg,
+      this.statusMessage,
+      this.friendUidList});
 
   factory Member.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> snapshot) {

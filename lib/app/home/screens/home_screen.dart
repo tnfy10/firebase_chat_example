@@ -1,11 +1,9 @@
-import 'package:firebase_chat_example/app/home/controllers/bottom_nav_controller.dart';
-import 'package:firebase_chat_example/app/home/controllers/chat_room_controller.dart';
-import 'package:firebase_chat_example/app/home/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
-import '../controllers/chat_controller.dart';
+import 'chat_room_list_screen.dart';
+import 'friend_list_screen.dart';
+import 'more_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,18 +13,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final userController = Get.find<UserController>();
-  final bottomNavController = Get.find<BottomNavController>();
   final _tabViewController = PersistentTabController(initialIndex: 0);
 
-  @override
-  void initState() {
-    super.initState();
-    userController.initDataLoad();
-  }
+  int currentScreenIdx = 0;
 
-  List<PersistentBottomNavBarItem> bottomNavBarItemList(BuildContext context) =>
-      [
+  List<Widget> screens() =>
+      [const FriendListScreen(), const ChatRoomListScreen(), const MoreScreen()];
+
+  List<PersistentBottomNavBarItem> bottomNavBarItemList(BuildContext context) => [
         PersistentBottomNavBarItem(
             icon: const Icon(Icons.account_circle),
             title: "친구",
@@ -52,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: PersistentTabView(
           context,
           controller: _tabViewController,
-          screens: bottomNavController.screens,
+          screens: screens(),
           items: bottomNavBarItemList(context),
           confineInSafeArea: true,
           backgroundColor: Theme.of(context).colorScheme.background,
