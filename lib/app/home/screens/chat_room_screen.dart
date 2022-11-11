@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_chat_example/app/home/controllers/chat_room_controller.dart';
 import 'package:firebase_chat_example/components/chat_bubble.dart';
 import 'package:flutter/material.dart';
@@ -61,16 +62,29 @@ class ChatRoomScreen extends StatelessWidget {
                                         : senderProfileImg?.isNotEmpty ?? false
                                             ? Padding(
                                                 padding: const EdgeInsets.only(left: 10),
-                                                child: Image.network(senderProfileImg!,
-                                                    width: 50,
-                                                    height: 50, loadingBuilder: (context, _, __) {
-                                                  return const SizedBox(
-                                                      width: 50,
-                                                      height: 50,
-                                                      child: CircularProgressIndicator());
-                                                }, errorBuilder: (_, __, ___) {
-                                                  return const Icon(Icons.account_circle, size: 50);
-                                                }),
+                                                child: CachedNetworkImage(
+                                                    imageUrl: senderProfileImg!,
+                                                    imageBuilder: (context, imageProvider) {
+                                                      return Container(
+                                                          width: 50,
+                                                          height: 50,
+                                                          decoration: BoxDecoration(
+                                                            shape: BoxShape.circle,
+                                                            image: DecorationImage(
+                                                                image: imageProvider,
+                                                                fit: BoxFit.cover),
+                                                          ));
+                                                    },
+                                                    progressIndicatorBuilder: (context, _, __) {
+                                                      return const SizedBox(
+                                                          width: 50,
+                                                          height: 50,
+                                                          child: CircularProgressIndicator());
+                                                    },
+                                                    errorWidget: (_, __, ___) {
+                                                      return const Icon(Icons.account_circle,
+                                                          size: 50);
+                                                    }),
                                               )
                                             : const Icon(Icons.account_circle, size: 50),
                                     Padding(

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_chat_example/app/home/controllers/chat_controller.dart';
 import 'package:firebase_chat_example/app/home/controllers/chat_room_controller.dart';
 import 'package:firebase_chat_example/app/home/controllers/user_controller.dart';
@@ -50,40 +51,47 @@ class FriendListScreen extends StatelessWidget with CommonDialog {
                 icon: const Icon(Icons.add))
           ],
         ),
-        body: userController.isLoading.value
-            ? const Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: InkWell(
-                      borderRadius: const BorderRadius.all(Radius.circular(12)),
-                      onTap: () {
-                        chatRoomController
-                            .startOneOnOneChat(userController.friendList[index].email!)
-                            .then((_) {
-                          Get.to(() => ChatRoomScreen(), binding: BindingsBuilder(() {
-                            Get.put(ChatController());
-                          }));
-                        });
-                      },
-                      child: ListTile(
-                        leading: Image.network(userController.friendList[index].profileImg ?? "",
+        body: ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          itemBuilder: (context, index) {
+            return Card(
+              child: InkWell(
+                borderRadius: const BorderRadius.all(Radius.circular(12)),
+                onTap: () {
+                  chatRoomController
+                      .startOneOnOneChat(userController.friendList[index].email!)
+                      .then((_) {
+                    Get.to(() => ChatRoomScreen(), binding: BindingsBuilder(() {
+                      Get.put(ChatController());
+                    }));
+                  });
+                },
+                child: ListTile(
+                  leading: CachedNetworkImage(
+                      imageUrl: userController.friendList[index].profileImg ?? "",
+                      imageBuilder: (context, imageProvider) {
+                        return Container(
                             width: 56,
                             height: 56,
-                            fit: BoxFit.cover, loadingBuilder: (context, _, __) {
-                          return const SizedBox(
-                              width: 56, height: 56, child: CircularProgressIndicator());
-                        }, errorBuilder: (_, __, ___) {
-                          return const Icon(Icons.account_circle, size: 56);
-                        }),
-                        title: Text(userController.friendList[index].nickname ?? ""),
-                        subtitle: Text(userController.friendList[index].statusMessage ?? ""),
-                      ),
-                    ),
-                  );
-                },
-                itemCount: userController.friendList.length,
-              ));
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                            ));
+                      },
+                      progressIndicatorBuilder: (context, _, __) {
+                        return const SizedBox(
+                            width: 56, height: 56, child: CircularProgressIndicator());
+                      },
+                      errorWidget: (_, __, ___) {
+                        return const Icon(Icons.account_circle, size: 56);
+                      }),
+                  title: Text(userController.friendList[index].nickname ?? ""),
+                  subtitle: Text(userController.friendList[index].statusMessage ?? ""),
+                ),
+              ),
+            );
+          },
+          itemCount: userController.friendList.length,
+        ));
   }
 }

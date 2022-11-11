@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,7 +21,6 @@ class UserController extends GetxController {
   Rx<Member> member = Member().obs;
 
   RxList<Member> friendList = <Member>[].obs;
-  RxBool isLoading = false.obs;
 
   RxBool isValidEmail = false.obs;
 
@@ -33,16 +33,13 @@ class UserController extends GetxController {
   }
 
   void initData() async {
-    isLoading.value = true;
     await getMemberData();
     await getFriendList();
-    isLoading.value = false;
   }
 
   Future<void> getMemberData() async {
     try {
-      final docRef =
-          db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
+      final docRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
       final doc = await docRef.get();
       member.value = Member.fromFirestore(doc);
       member.refresh();
@@ -68,14 +65,13 @@ class UserController extends GetxController {
       debugPrint("UserController::getFriendList:${e.toString()}");
     } finally {
       friendList.value = tempList;
+      friendList.refresh();
     }
   }
 
   Future<bool> addFriend(String email) async {
-    final friendRef = await db
-        .collection(FirestoreCollection.member)
-        .where("email", isEqualTo: email)
-        .get();
+    final friendRef =
+        await db.collection(FirestoreCollection.member).where("email", isEqualTo: email).get();
 
     if (auth.currentUser?.email == email) {
       errMsg = "본인을 친구로 추가할 수 없습니다.";
@@ -94,8 +90,7 @@ class UserController extends GetxController {
       return false;
     }
 
-    final memberRef =
-        db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
+    final memberRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
     memberRef.update({
       "friendUidList": FieldValue.arrayUnion([friendUid])
     });
@@ -127,7 +122,13 @@ class UserController extends GetxController {
     }
   }
 
-  Future<void> updateNickname() async {
-
+  void updateNickname({required String nickname, required Function(bool, String) resultCallback}) async {
+    try {
+      final memberRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
+      await memberRef.update({'nickname': nickname});
+      getMemberData();
+    } catch (e) {
+      debugPrint('UserController::updateNickname::error:${e.toString()}');
+    }
   }
 }
