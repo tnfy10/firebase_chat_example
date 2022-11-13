@@ -12,7 +12,7 @@ import 'chat_controller.dart';
 class ChatRoomController extends GetxController {
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
-  final memberList = <Member>[];
+  final memberMap = <String, Member>{};
 
   Map<String, String?> memberProfileImgMap = {};
 
@@ -30,15 +30,15 @@ class ChatRoomController extends GetxController {
   }
 
   Future<void> _fetchMemberList(List uidList) async {
-    memberList.clear();
+    memberMap.clear();
     for (var uid in uidList) {
       var member = await db.collection(FirestoreCollection.member).doc(uid).get();
-      memberList.add(Member.fromFirestore(member));
+      memberMap[uid] = Member.fromFirestore(member);
     }
   }
 
   Future<void> startOneOnOneChat(String email) async {
-    memberList.clear();
+    memberMap.clear();
     if (auth.currentUser?.uid == null) {
       return Future.error("ChatController::getChatRoomList::Current User uid is null.");
     }
@@ -53,7 +53,7 @@ class ChatRoomController extends GetxController {
     final friendUid = memberRef.docs[0].id;
     final uidList = [auth.currentUser!.uid, friendUid];
 
-    memberList.add(Member.fromFirestore(memberRef.docs[0]));
+    memberMap[memberRef.docs[0].id] = Member.fromFirestore(memberRef.docs[0]);
 
     final chatRoomRef = await db
         .collection(FirestoreCollection.chatRoom)

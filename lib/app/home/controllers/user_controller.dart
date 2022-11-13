@@ -9,7 +9,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../../const/firestore_collection.dart';
 import '../model/member.dart';
@@ -19,9 +18,7 @@ class UserController extends GetxController {
   final db = FirebaseFirestore.instance;
 
   Rx<Member> member = Member().obs;
-
   RxList<Member> friendList = <Member>[].obs;
-
   RxBool isValidEmail = false.obs;
 
   var errMsg = "";
@@ -29,43 +26,35 @@ class UserController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    initData();
+    receiveMemberData();
   }
 
-  void initData() async {
-    await getMemberData();
-    await getFriendList();
-  }
-
-  Future<void> getMemberData() async {
+  void receiveMemberData() async {
     try {
-      final docRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
-      final doc = await docRef.get();
-      member.value = Member.fromFirestore(doc);
-      member.refresh();
+      db
+          .collection(FirestoreCollection.member)
+          .doc(auth.currentUser!.uid)
+          .snapshots()
+          .listen((event) {
+        member.value = Member.fromFirestore(event);
+        if (member.value.friendUidList?.length != friendList.length) {
+          friendList.clear();
+          for (final uid in member.value.friendUidList ?? []) {
+            db.collection(FirestoreCollection.member).doc(uid).get().then((value) {
+              friendList.add(Member.fromFirestore(value));
+            });
+          }
+        }
+        member.refresh();
+      }).onError((e) {
+        throw (e);
+      });
     } catch (e) {
       debugPrint("UserController::getMemberData:member 데이터 로드 에러");
       debugPrint("UserController::getMemberData:${e.toString()}");
       auth.signOut().then((_) {
         Get.offAll(LoginScreen(), binding: LoginBinding());
       });
-    }
-  }
-
-  Future<void> getFriendList() async {
-    List<Member> tempList = [];
-    try {
-      for (final uid in member.value.friendUidList ?? []) {
-        final docRef = db.collection(FirestoreCollection.member).doc(uid);
-        final doc = await docRef.get();
-        tempList.add(Member.fromFirestore(doc));
-      }
-    } catch (e) {
-      debugPrint("UserController::getFriendList:friend 데이터 로드 에러");
-      debugPrint("UserController::getFriendList:${e.toString()}");
-    } finally {
-      friendList.value = tempList;
-      friendList.refresh();
     }
   }
 
@@ -90,24 +79,26 @@ class UserController extends GetxController {
       return false;
     }
 
-    final memberRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
-    memberRef.update({
+    db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid).update({
       "friendUidList": FieldValue.arrayUnion([friendUid])
     });
 
-    await getFriendList();
+    db.collection(FirestoreCollection.member).doc(friendUid).get().then((value) {
+      friendList.add(Member.fromFirestore(value));
+    });
 
     return true;
   }
 
-  Future<void> updateProfileImage() async {
+  void updateProfileImage() async {
     try {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
       final storageRef = FirebaseStorage.instance.ref();
 
       if (image?.path == null) {
-        return Future.error('UserController::updateProfileImage::이미지 경로가 null임.');
+        debugPrint('UserController::updateProfileImage::이미지 경로가 null임.');
+        return;
       }
 
       final imageRef = storageRef.child(image!.path);
@@ -116,19 +107,37 @@ class UserController extends GetxController {
       final imgUrl = await imageRef.getDownloadURL();
       final memberRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
       await memberRef.update({'profileImg': imgUrl});
-      getMemberData();
     } catch (e) {
-      return Future.error('UserController::updateProfileImage::error:${e.toString()}');
+      debugPrint('UserController::updateProfileImage::error:${e.toString()}');
     }
   }
 
-  void updateNickname({required String nickname, required Function(bool, String) resultCallback}) async {
+  void updateNickname(String nickname) async {
     try {
       final memberRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
       await memberRef.update({'nickname': nickname});
-      getMemberData();
     } catch (e) {
       debugPrint('UserController::updateNickname::error:${e.toString()}');
     }
+  }
+
+  void updateStatusMessage(String statusMessage) async {
+    try {
+      final memberRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
+      await memberRef.update({'statusMessage': statusMessage});
+    } catch (e) {
+      debugPrint('UserController::updateNickname::error:${e.toString()}');
+    }
+  }
+
+  void updateNotification() {}
+
+  void updatePassword() {}
+
+  void withdrawal() async {
+    await auth.currentUser?.delete();
+    auth.signOut().then((_) {
+      Get.offAll(LoginScreen(), binding: LoginBinding());
+    });
   }
 }

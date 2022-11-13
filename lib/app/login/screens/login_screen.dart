@@ -128,7 +128,7 @@ class LoginScreen extends StatelessWidget with CommonDialog {
   void _loginButton(BuildContext context) {
     FocusManager.instance.primaryFocus?.unfocus();
     loginController.fetchLogin().then((_) {
-      Get.off(() => HomeScreen(), binding: HomeBinding());
+      Get.off(() => const HomeScreen(), binding: HomeBinding());
       Get.delete<LoginController>();
     }).catchError((e) {
       showOneButtonDialog(

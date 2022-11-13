@@ -18,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentScreenIdx = 0;
 
   List<Widget> screens() =>
-      [const FriendListScreen(), const ChatRoomListScreen(), const MoreScreen()];
+      [FriendListScreen(), const ChatRoomListScreen(), MoreScreen()];
 
   List<PersistentBottomNavBarItem> bottomNavBarItemList(BuildContext context) => [
         PersistentBottomNavBarItem(

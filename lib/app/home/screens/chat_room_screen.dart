@@ -47,7 +47,7 @@ class ChatRoomScreen extends StatelessWidget {
                               final senderUid = chatController.chatList[index].senderUid;
                               final myUid = chatController.auth.currentUser?.uid;
                               final senderProfileImg =
-                                  chatRoomController.memberProfileImgMap[senderUid];
+                                  chatRoomController.memberProfileImgMap[senderUid] ?? '';
                               final dateFormat = DateFormat('HH:mm');
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 10),
@@ -59,34 +59,31 @@ class ChatRoomScreen extends StatelessWidget {
                                   children: [
                                     myUid == senderUid
                                         ? const SizedBox()
-                                        : senderProfileImg?.isNotEmpty ?? false
-                                            ? Padding(
-                                                padding: const EdgeInsets.only(left: 10),
-                                                child: CachedNetworkImage(
-                                                    imageUrl: senderProfileImg!,
-                                                    imageBuilder: (context, imageProvider) {
-                                                      return Container(
-                                                          width: 50,
-                                                          height: 50,
-                                                          decoration: BoxDecoration(
-                                                            shape: BoxShape.circle,
-                                                            image: DecorationImage(
-                                                                image: imageProvider,
-                                                                fit: BoxFit.cover),
-                                                          ));
-                                                    },
-                                                    progressIndicatorBuilder: (context, _, __) {
-                                                      return const SizedBox(
-                                                          width: 50,
-                                                          height: 50,
-                                                          child: CircularProgressIndicator());
-                                                    },
-                                                    errorWidget: (_, __, ___) {
-                                                      return const Icon(Icons.account_circle,
-                                                          size: 50);
-                                                    }),
-                                              )
-                                            : const Icon(Icons.account_circle, size: 50),
+                                        : Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: CachedNetworkImage(
+                                                imageUrl: senderProfileImg,
+                                                imageBuilder: (context, imageProvider) {
+                                                  return Container(
+                                                      width: 50,
+                                                      height: 50,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                            image: imageProvider,
+                                                            fit: BoxFit.cover),
+                                                      ));
+                                                },
+                                                progressIndicatorBuilder: (context, _, __) {
+                                                  return const SizedBox(
+                                                      width: 50,
+                                                      height: 50,
+                                                      child: CircularProgressIndicator());
+                                                },
+                                                errorWidget: (_, __, ___) {
+                                                  return const Icon(Icons.account_circle, size: 50);
+                                                }),
+                                          ),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 10),
                                       child: Column(
@@ -96,9 +93,9 @@ class ChatRoomScreen extends StatelessWidget {
                                               ? const SizedBox()
                                               : Padding(
                                                   padding: const EdgeInsets.only(bottom: 5),
-                                                  child: Text(
-                                                      chatRoomController.memberList[0].nickname ??
-                                                          ''),
+                                                  child: Text(chatRoomController
+                                                          .memberMap[senderUid]?.nickname ??
+                                                      ''),
                                                 ),
                                           ChatBubble(
                                               text: chatController.chatList[index].text ?? "",
