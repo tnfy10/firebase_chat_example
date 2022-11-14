@@ -62,7 +62,9 @@ class FriendListScreen extends StatelessWidget with CommonDialog {
                           .startOneOnOneChat(controller.friendList[index].email!)
                           .then((_) {
                         Get.to(() => ChatRoomScreen(), binding: BindingsBuilder(() {
-                          Get.put(ChatController());
+                          Get.put(ChatController(
+                              roomCode: chatRoomController.roomCode,
+                              memberMap: chatRoomController.memberMap));
                         }));
                       });
                     },

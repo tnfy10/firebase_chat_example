@@ -24,8 +24,7 @@ class ChatRoomListScreen extends StatelessWidget {
                   child: InkWell(
                     borderRadius: const BorderRadius.all(Radius.circular(12)),
                     onTap: () {
-                      chatRoomController
-                          .enterChatRoom(chatRoomListController.chatRoomList[index]);
+                      chatRoomController.enterChatRoom(chatRoomListController.chatRoomList[index]);
                     },
                     child: ListTile(
                       title: Text(chatRoomListController.chatRoomList[index].roomName),

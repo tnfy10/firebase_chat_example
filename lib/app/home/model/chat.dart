@@ -26,13 +26,14 @@ class Chat {
   final int? sendMillisecondEpoch;
   final String? text;
   final SendKind? kind;
+  final String? fileName;
 
-  Chat(
-      {required this.roomCode,
-      required this.senderUid,
-      required this.sendMillisecondEpoch,
-      required this.text,
-      required this.kind});
+  Chat({required this.roomCode,
+    required this.senderUid,
+    required this.sendMillisecondEpoch,
+    required this.text,
+    required this.kind,
+    this.fileName});
 
   factory Chat.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     final data = snapshot.data();
@@ -41,15 +42,18 @@ class Chat {
         senderUid: data?['senderUid'],
         sendMillisecondEpoch: data?['sendMillisecondEpoch'],
         text: data?['text'],
-        kind: SendKind.fromString(data?['kind'] ?? "message"));
+        kind: SendKind.fromString(data?['kind'] ?? "message"),
+        fileName: data?['fileName']);
   }
 
-  Map<String, dynamic> toFirestore() => {
+  Map<String, dynamic> toFirestore() =>
+      {
         if (roomCode != null) "roomCode": roomCode,
         if (senderUid != null) "senderUid": senderUid,
         if (sendMillisecondEpoch != null)
           "sendMillisecondEpoch": sendMillisecondEpoch,
         if (text != null) "text": text,
-        if (kind != null) "kind": describeEnum(kind!)
+        if (kind != null) "kind": describeEnum(kind!),
+        if (fileName != null) "fileName": fileName
       };
 }

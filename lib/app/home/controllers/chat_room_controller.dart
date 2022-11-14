@@ -14,18 +14,16 @@ class ChatRoomController extends GetxController {
   final db = FirebaseFirestore.instance;
   final memberMap = <String, Member>{};
 
-  Map<String, String?> memberProfileImgMap = {};
-
   RxBool isLoading = false.obs;
 
-  String? roomCode;
+  late String roomCode;
 
   Future<void> enterChatRoom(Room room) async {
     roomCode = room.roomCode;
     await _fetchMemberList(room.uidList);
-    await _fetchMemberProfileImg();
-    Get.to(() => ChatRoomScreen(), binding: BindingsBuilder(() {
-      Get.put(ChatController());
+    Get.to(() => ChatRoomScreen(),
+        binding: BindingsBuilder(() {
+      Get.put(ChatController(roomCode: roomCode, memberMap: memberMap));
     }));
   }
 
@@ -62,7 +60,7 @@ class ChatRoomController extends GetxController {
 
     if (chatRoomRef.docs.isNotEmpty) {
       roomCode = chatRoomRef.docs[0].id;
-      await _fetchMemberProfileImg();
+      await _fetchMemberList(uidList);
       return;
     }
 
@@ -74,8 +72,9 @@ class ChatRoomController extends GetxController {
       return Future.error("ChatController::createChatRoom::Current User uid is null.");
     }
 
+    final uidList = [auth.currentUser!.uid, friendUid];
     final data = {
-      "uidList": [auth.currentUser!.uid, friendUid]
+      "uidList": uidList
     };
 
     final uuid = const Uuid().v1();
@@ -83,20 +82,6 @@ class ChatRoomController extends GetxController {
     await db.collection(FirestoreCollection.chatRoom).doc(uuid).set(data, SetOptions(merge: true));
 
     roomCode = uuid;
-    await _fetchMemberProfileImg();
-  }
-
-  Future<void> _fetchMemberProfileImg() async {
-    memberProfileImgMap.clear();
-
-    final chatRoomData = await db.collection(FirestoreCollection.chatRoom).doc(roomCode).get();
-    final uidList = chatRoomData.data()!["uidList"];
-
-    for (var uid in uidList) {
-      db.collection(FirestoreCollection.member).doc(uid).get().then((value) {
-        final member = Member.fromFirestore(value);
-        memberProfileImgMap[uid] = member.profileImg ?? '';
-      });
-    }
+    await _fetchMemberList(uidList);
   }
 }
