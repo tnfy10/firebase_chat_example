@@ -36,88 +36,88 @@ class ChatRoomScreen extends StatelessWidget {
                             child: controller.isLoading.value
                                 ? const Center(child: CircularProgressIndicator())
                                 : ListView.builder(
-                                reverse: true,
-                                padding: const EdgeInsets.only(top: 10),
-                                controller: ScrollController(),
-                                itemCount: controller.chatList.length,
-                                itemBuilder: (context, index) {
-                                  final senderUid = controller.chatList[index].senderUid;
-                                  final myUid = controller.auth.currentUser?.uid;
-                                  final senderProfileImg =
-                                      controller.memberMap[senderUid]?.profileImg ?? '';
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: Row(
-                                      mainAxisAlignment: myUid == senderUid
-                                          ? MainAxisAlignment.end
-                                          : MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        myUid == senderUid
-                                            ? const SizedBox()
-                                            : Padding(
-                                          padding: const EdgeInsets.only(left: 10),
-                                          child: CachedNetworkImage(
-                                              imageUrl: senderProfileImg,
-                                              imageBuilder: (context, imageProvider) {
-                                                return Container(
-                                                    width: 50,
-                                                    height: 50,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      image: DecorationImage(
-                                                          image: imageProvider,
-                                                          fit: BoxFit.cover),
-                                                    ));
-                                              },
-                                              progressIndicatorBuilder:
-                                                  (context, _, __) {
-                                                return const SizedBox(
-                                                    width: 50,
-                                                    height: 50,
-                                                    child:
-                                                    CircularProgressIndicator());
-                                              },
-                                              errorWidget: (_, __, ___) {
-                                                return const Icon(
-                                                    Icons.account_circle,
-                                                    size: 50);
-                                              }),
-                                        ),
-                                        Padding(
-                                          padding:
-                                          const EdgeInsets.symmetric(horizontal: 10),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              myUid == senderUid
-                                                  ? const SizedBox()
-                                                  : Padding(
-                                                padding:
-                                                const EdgeInsets.only(bottom: 5),
-                                                child: Text(controller
-                                                    .memberMap[senderUid]
-                                                    ?.nickname ??
-                                                    ''),
+                                    reverse: true,
+                                    padding: const EdgeInsets.only(top: 10),
+                                    controller: ScrollController(),
+                                    itemCount: controller.chatList.length,
+                                    itemBuilder: (context, index) {
+                                      final senderUid = controller.chatList[index].senderUid;
+                                      final myUid = controller.auth.currentUser?.uid;
+                                      final senderProfileImg =
+                                          controller.memberMap[senderUid]?.profileImg ?? '';
+                                      return Padding(
+                                        padding: const EdgeInsets.only(bottom: 10),
+                                        child: Row(
+                                          mainAxisAlignment: myUid == senderUid
+                                              ? MainAxisAlignment.end
+                                              : MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            myUid == senderUid
+                                                ? const SizedBox()
+                                                : Padding(
+                                                    padding: const EdgeInsets.only(left: 10),
+                                                    child: CachedNetworkImage(
+                                                        imageUrl: senderProfileImg,
+                                                        imageBuilder: (context, imageProvider) {
+                                                          return Container(
+                                                              width: 50,
+                                                              height: 50,
+                                                              decoration: BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                image: DecorationImage(
+                                                                    image: imageProvider,
+                                                                    fit: BoxFit.cover),
+                                                              ));
+                                                        },
+                                                        progressIndicatorBuilder: (context, _, __) {
+                                                          return const SizedBox(
+                                                              width: 50,
+                                                              height: 50,
+                                                              child: CircularProgressIndicator());
+                                                        },
+                                                        errorWidget: (_, __, ___) {
+                                                          return const Icon(Icons.account_circle,
+                                                              size: 50);
+                                                        }),
+                                                  ),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  myUid == senderUid
+                                                      ? const SizedBox()
+                                                      : Padding(
+                                                          padding: const EdgeInsets.only(bottom: 5),
+                                                          child: Text(controller
+                                                                  .memberMap[senderUid]?.nickname ??
+                                                              ''),
+                                                        ),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      switch (controller.chatList[index].kind) {
+                                                        case SendKind.image:
+                                                        case SendKind.file:
+                                                          controller.downloadFile(
+                                                              controller.chatList[index].text,
+                                                              controller.chatList[index].fileName);
+                                                          break;
+                                                        default:
+                                                          break;
+                                                      }
+                                                    },
+                                                    child: ChatBubble(
+                                                        chat: controller.chatList[index],
+                                                        isMe: myUid == senderUid),
+                                                  )
+                                                ],
                                               ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  if (controller.chatList[index].kind ==
-                                                      SendKind.file) {
-                                                    controller.downloadFile();
-                                                  }
-                                                },
-                                                child: ChatBubble(
-                                                    chat: controller.chatList[index],
-                                                    isMe: myUid == senderUid),
-                                              )
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  );
-                                })),
+                                      );
+                                    })),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
