@@ -55,6 +55,7 @@ class NotificationController extends GetxController {
           .collection(FirestoreCollection.chatRoom)
           .where('uidList', arrayContains: auth.currentUser?.uid)
           .get();
+
       final roomCodeList = roomRefList.docs.map((e) => e.id).toList();
       db
           .collection(FirestoreCollection.chat)
@@ -65,7 +66,9 @@ class NotificationController extends GetxController {
           for (var item in event.docChanges) {
             if (item.type == DocumentChangeType.added) {
               final chat = Chat.fromFirestore(item.doc);
-              pushNotification(chat);
+              if (chat.senderUid != auth.currentUser?.uid) {
+                pushNotification(chat);
+              }
             }
           }
         }

@@ -37,13 +37,11 @@ class UserController extends GetxController {
           .snapshots()
           .listen((event) {
         member.value = Member.fromFirestore(event);
-        if (member.value.friendUidList?.length != friendList.length) {
-          friendList.clear();
-          for (final uid in member.value.friendUidList ?? []) {
-            db.collection(FirestoreCollection.member).doc(uid).get().then((value) {
-              friendList.add(Member.fromFirestore(value));
-            });
-          }
+        friendList.clear();
+        for (final uid in member.value.friendUidList ?? []) {
+          db.collection(FirestoreCollection.member).doc(uid).get().then((value) {
+            friendList.add(Member.fromFirestore(value));
+          });
         }
         member.refresh();
       }).onError((e) {
@@ -101,8 +99,8 @@ class UserController extends GetxController {
         return;
       }
 
-      final imageRef = storageRef.child(image!.path);
-      File file = File(image.path);
+      final imageRef = storageRef.child('profileImg/${auth.currentUser!.uid}');
+      File file = File(image!.path);
       await imageRef.putFile(file);
       final imgUrl = await imageRef.getDownloadURL();
       final memberRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
@@ -129,8 +127,6 @@ class UserController extends GetxController {
       debugPrint('UserController::updateNickname::error:${e.toString()}');
     }
   }
-
-  void updateNotification() {}
 
   void updatePassword() {}
 

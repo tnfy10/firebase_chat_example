@@ -77,9 +77,11 @@ class ChatController extends GetxController {
       return;
     }
 
+    Get.snackbar('이미지 전송 중', image!.name);
+
     const uuid = Uuid();
     final imageRef = storageRef.child('$roomCode/${uuid.v1()}');
-    File file = File(image!.path);
+    File file = File(image.path);
     await imageRef.putFile(file);
     final imgUrl = await imageRef.getDownloadURL();
 
@@ -91,7 +93,12 @@ class ChatController extends GetxController {
         kind: SendKind.image,
         fileName: image.name);
 
-    await db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore());
+    db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore()).then((_) {
+      Get.snackbar('이미지 전송 완료', image.name);
+    }).catchError((e) {
+      debugPrint('ChatController::sendImage::error:${e.toString()}');
+      Get.snackbar('이미지 전송 실패', image.name);
+    });
   }
 
   Future<void> sendFile() async {
@@ -107,6 +114,8 @@ class ChatController extends GetxController {
       return;
     }
 
+    Get.snackbar('파일 전송 중', result.files.single.name);
+
     const uuid = Uuid();
     final fileRef = storageRef.child('$roomCode/${uuid.v1()}');
     File file = File(result.files.single.path!);
@@ -121,7 +130,12 @@ class ChatController extends GetxController {
         kind: SendKind.file,
         fileName: result.files.single.name);
 
-    await db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore());
+    db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore()).then((_) {
+      Get.snackbar('파일 전송 완료', result.files.single.name);
+    }).catchError((e) {
+      debugPrint('ChatController::sendFile::error:${e.toString()}');
+      Get.snackbar('파일 전송 실패', result.files.single.name);
+    });
   }
 
   Future<void> downloadFile(String? url, String? fileName) async {
