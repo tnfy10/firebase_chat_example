@@ -8,8 +8,7 @@ class HomeBinding extends Bindings {
   @override
   void dependencies() {
     Get.put(UserController());
+    Get.put(ChatRoomController());
     Get.put(NotificationController());
-    Get.lazyPut(() => ChatRoomController());
   }
-
 }

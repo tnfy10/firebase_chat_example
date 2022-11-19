@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_example/const/firestore_collection.dart';
@@ -13,8 +15,6 @@ class ChatRoomController extends GetxController {
   final memberMap = <String, Member>{};
 
   RxMap chatRoomMap = <String, ChatRoom>{}.obs;
-
-  late String currentRoomCode;
 
   @override
   void onInit() {
@@ -38,44 +38,61 @@ class ChatRoomController extends GetxController {
     }
   }
 
-  Future<void> startOneOnOneChat(String friendUid) async {
-    if (auth.currentUser?.uid == null) {
-      return Future.error("ChatController::getChatRoomList::Current User uid is null.");
+  Future<String> startOneOnOneChat(String friendUid) async {
+    final completer = Completer<String>();
+
+    try {
+      if (auth.currentUser?.uid == null) {
+        throw ("ChatController::getChatRoomList::Current User uid is null.");
+      } else {
+        final uidList = [auth.currentUser!.uid, friendUid];
+        await fetchMemberList(uidList);
+
+        final chatRoomRef = await db
+            .collection(FirestoreCollection.chatRoom)
+            .where("uidList", arrayContainsAny: uidList)
+            .get();
+
+        if (chatRoomRef.docs.isEmpty) {
+          final roomCode = await _createOneOnOneChatRoom(uidList);
+          completer.complete(roomCode);
+        } else {
+          completer.complete(chatRoomRef.docs[0].id);
+        }
+      }
+    } catch (e) {
+      completer.completeError(e);
     }
 
-    final uidList = [auth.currentUser!.uid, friendUid];
-    await fetchMemberList(uidList);
-
-    final chatRoomRef = await db
-        .collection(FirestoreCollection.chatRoom)
-        .where("uidList", arrayContainsAny: uidList)
-        .get();
-
-    if (chatRoomRef.docs.isEmpty) {
-      await _createOneOnOneChatRoom(uidList);
-    } else {
-      currentRoomCode = chatRoomRef.docs[0].id;
-    }
+    return completer.future;
   }
 
-  Future<void> _createOneOnOneChatRoom(List uidList) async {
+  Future<String> _createOneOnOneChatRoom(List uidList) async {
+    final completer = Completer<String>();
+
     if (auth.currentUser?.uid == null) {
-      return Future.error("ChatController::createChatRoom::Current User uid is null.");
-    }
+      completer.completeError("ChatController::createChatRoom::Current User uid is null.");
+    } else {
+      var roomName = '';
 
-    var roomName = '';
+      for (var i = 0; i < uidList.length; i++) {
+        roomName += memberMap[uidList[i]]!.nickname!;
+        if (i != uidList.length - 1) {
+          roomName += ', ';
+        }
+      }
 
-    for (var i = 0; i < uidList.length; i++) {
-      roomName += memberMap[uidList[i]]!.nickname!;
-      if (i != uidList.length - 1) {
-        roomName += ', ';
+      final chatRoom = ChatRoom(roomName: roomName, recentMsg: '', uidList: uidList);
+      final uuid = const Uuid().v1();
+
+      try {
+        await db.collection(FirestoreCollection.chatRoom).doc(uuid).set(chatRoom.toFirestore());
+        completer.complete(uuid);
+      } catch (e) {
+        completer.completeError(e);
       }
     }
 
-    final chatRoom = ChatRoom(roomName: roomName, recentMsg: '', uidList: uidList);
-    final uuid = const Uuid().v1();
-
-    await db.collection(FirestoreCollection.chatRoom).doc(uuid).set(chatRoom.toFirestore());
-    currentRoomCode = uuid;
+    return completer.future;
   }
 }

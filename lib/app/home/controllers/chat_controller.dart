@@ -16,6 +16,8 @@ import 'package:uuid/uuid.dart';
 import '../model/chat.dart';
 import '../model/member.dart';
 
+String currentRoomCode = '';
+
 class ChatController extends GetxController {
   final String roomCode;
   final Map<String, Member> memberMap;
@@ -32,6 +34,13 @@ class ChatController extends GetxController {
   void onInit() {
     super.onInit();
     receiveChatMessage();
+    currentRoomCode = roomCode;
+  }
+
+  @override
+  void onClose() {
+    currentRoomCode = '';
+    super.onClose();
   }
 
   void receiveChatMessage() {

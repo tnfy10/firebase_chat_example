@@ -58,14 +58,21 @@ class FriendListScreen extends StatelessWidget with CommonDialog {
                         child: InkWell(
                           borderRadius: const BorderRadius.all(Radius.circular(12)),
                           onTap: () {
-                            chatRoomController
-                                .startOneOnOneChat(uid)
-                                .then((_) {
+                            chatRoomController.startOneOnOneChat(uid).then((roomCode) {
                               Get.to(() => ChatRoomScreen(), binding: BindingsBuilder(() {
                                 Get.put(ChatController(
-                                    roomCode: chatRoomController.currentRoomCode,
+                                    roomCode: roomCode,
                                     memberMap: chatRoomController.memberMap));
                               }));
+                            }).catchError((e) {
+                              debugPrint(e);
+                              showOneButtonDialog(
+                                  context: context,
+                                  title: '안내',
+                                  content: '채팅 서버에 연결할 수 없습니다.\n잠시 후 다시 시도해주세요.',
+                                  onPressed: () {
+                                    Get.back();
+                                  });
                             });
                           },
                           child: ListTile(

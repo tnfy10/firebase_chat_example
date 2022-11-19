@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../const/firestore_collection.dart';
 import '../../../const/notification_id.dart';
 import '../model/chat.dart';
+import 'chat_controller.dart';
 
 class NotificationController extends GetxController {
   final auth = FirebaseAuth.instance;
@@ -28,8 +29,10 @@ class NotificationController extends GetxController {
 
   void initAllowedNotification() async {
     final prefs = await SharedPreferences.getInstance();
-    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()?.requestPermission().then((value) {
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestPermission()
+        .then((value) {
       prefs.setBool(notificationKey, value ?? false);
       isAllowNotification.value = value ?? false;
     });
@@ -41,8 +44,10 @@ class NotificationController extends GetxController {
       prefs.setBool(notificationKey, value);
       isAllowNotification.value = value;
     } else {
-      flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()?.requestPermission().then((value) {
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestPermission()
+          .then((value) {
         prefs.setBool(notificationKey, value ?? false);
         isAllowNotification.value = value ?? false;
       });
@@ -57,6 +62,7 @@ class NotificationController extends GetxController {
           .get();
 
       final roomCodeList = roomRefList.docs.map((e) => e.id).toList();
+
       db
           .collection(FirestoreCollection.chat)
           .where('roomCode', whereIn: roomCodeList)
@@ -66,7 +72,7 @@ class NotificationController extends GetxController {
           for (var item in event.docChanges) {
             if (item.type == DocumentChangeType.added) {
               final chat = Chat.fromFirestore(item.doc);
-              if (chat.senderUid != auth.currentUser?.uid) {
+              if (chat.senderUid != auth.currentUser?.uid && currentRoomCode != chat.roomCode) {
                 pushNotification(chat);
               }
             }
