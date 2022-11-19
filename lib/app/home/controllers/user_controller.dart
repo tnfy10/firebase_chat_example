@@ -18,7 +18,7 @@ class UserController extends GetxController {
   final db = FirebaseFirestore.instance;
 
   Rx<Member> member = Member().obs;
-  RxList<Member> friendList = <Member>[].obs;
+  RxMap friendMap = <String, Member>{}.obs;
   RxBool isValidEmail = false.obs;
 
   var errMsg = "";
@@ -37,10 +37,9 @@ class UserController extends GetxController {
           .snapshots()
           .listen((event) {
         member.value = Member.fromFirestore(event);
-        friendList.clear();
         for (final uid in member.value.friendUidList ?? []) {
           db.collection(FirestoreCollection.member).doc(uid).get().then((value) {
-            friendList.add(Member.fromFirestore(value));
+            friendMap[uid] = Member.fromFirestore(value);
           });
         }
         member.refresh();
@@ -70,7 +69,7 @@ class UserController extends GetxController {
       return false;
     }
 
-    final friendUid = friendRef.docs[0].reference.id;
+    final friendUid = friendRef.docs[0].id;
 
     if (member.value.friendUidList?.contains(friendUid) ?? true) {
       errMsg = "이미 추가된 사용자입니다.";
@@ -82,7 +81,7 @@ class UserController extends GetxController {
     });
 
     db.collection(FirestoreCollection.member).doc(friendUid).get().then((value) {
-      friendList.add(Member.fromFirestore(value));
+      friendMap[friendUid] = Member.fromFirestore(value);
     });
 
     return true;

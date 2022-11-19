@@ -51,49 +51,44 @@ class FriendListScreen extends StatelessWidget with CommonDialog {
                     icon: const Icon(Icons.add))
               ],
             ),
-            body: ListView.builder(
+            body: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              itemBuilder: (context, index) {
-                return Card(
-                  child: InkWell(
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                    onTap: () {
-                      chatRoomController
-                          .startOneOnOneChat(controller.friendList[index].email!)
-                          .then((_) {
-                        Get.to(() => ChatRoomScreen(), binding: BindingsBuilder(() {
-                          Get.put(ChatController(
-                              roomCode: chatRoomController.roomCode,
-                              memberMap: chatRoomController.memberMap));
-                        }));
-                      });
-                    },
-                    child: ListTile(
-                      leading: CachedNetworkImage(
-                          imageUrl: controller.friendList[index].profileImg ?? "",
-                          imageBuilder: (context, imageProvider) {
-                            return Container(
-                                width: 56,
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                                ));
+              children: controller.friendMap.keys
+                  .map((uid) => Card(
+                        child: InkWell(
+                          borderRadius: const BorderRadius.all(Radius.circular(12)),
+                          onTap: () {
+                            chatRoomController
+                                .startOneOnOneChat(uid)
+                                .then((_) {
+                              Get.to(() => ChatRoomScreen(), binding: BindingsBuilder(() {
+                                Get.put(ChatController(
+                                    roomCode: chatRoomController.currentRoomCode,
+                                    memberMap: chatRoomController.memberMap));
+                              }));
+                            });
                           },
-                          progressIndicatorBuilder: (context, _, __) {
-                            return const SizedBox(
-                                width: 56, height: 56, child: CircularProgressIndicator());
-                          },
-                          errorWidget: (_, __, ___) {
-                            return const Icon(Icons.account_circle, size: 56);
-                          }),
-                      title: Text(controller.friendList[index].nickname ?? ""),
-                      subtitle: Text(controller.friendList[index].statusMessage ?? ""),
-                    ),
-                  ),
-                );
-              },
-              itemCount: controller.friendList.length,
+                          child: ListTile(
+                            leading: CachedNetworkImage(
+                                imageUrl: controller.friendMap[uid].profileImg ?? "",
+                                imageBuilder: (context, imageProvider) => Container(
+                                    width: 56,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image:
+                                          DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                                    )),
+                                placeholder: (_, __) => const SizedBox(
+                                    width: 56, height: 56, child: CircularProgressIndicator()),
+                                errorWidget: (_, __, ___) =>
+                                    const Icon(Icons.account_circle, size: 56)),
+                            title: Text(controller.friendMap[uid].nickname!),
+                            subtitle: Text(controller.friendMap[uid].statusMessage!),
+                          ),
+                        ),
+                      ))
+                  .toList(),
             )));
   }
 }

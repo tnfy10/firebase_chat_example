@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_example/const/firestore_collection.dart';
+import 'package:firebase_chat_example/utils/converter.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -60,7 +61,13 @@ class ChatController extends GetxController {
         text: msg,
         kind: SendKind.message);
 
-    await db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore());
+    await Future.wait([
+      db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore()),
+      db
+          .collection(FirestoreCollection.chatRoom)
+          .doc(roomCode)
+          .update({'recentMsg': convertChatText(chat)})
+    ]);
   }
 
   Future<void> sendImage() async {
@@ -98,6 +105,10 @@ class ChatController extends GetxController {
         fileName: image.name);
 
     db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore()).then((_) {
+      db
+          .collection(FirestoreCollection.chatRoom)
+          .doc(roomCode)
+          .update({'recentMsg': convertChatText(chat)});
       Get.snackbar('이미지 전송 완료', image.name);
     }).catchError((e) {
       debugPrint('ChatController::sendImage::error:${e.toString()}');
@@ -135,6 +146,10 @@ class ChatController extends GetxController {
         fileName: result.files.single.name);
 
     db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore()).then((_) {
+      db
+          .collection(FirestoreCollection.chatRoom)
+          .doc(roomCode)
+          .update({'recentMsg': convertChatText(chat)});
       Get.snackbar('파일 전송 완료', result.files.single.name);
     }).catchError((e) {
       debugPrint('ChatController::sendFile::error:${e.toString()}');
