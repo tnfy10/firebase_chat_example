@@ -56,13 +56,6 @@ class ChatBubble extends StatelessWidget {
     switch (chat.kind) {
       case SendKind.image:
         return CachedNetworkImage(
-            placeholder: (context, _) {
-              return Container(
-                  width: 150,
-                  height: 150,
-                  alignment: Alignment.center,
-                  child: const CircularProgressIndicator());
-            },
             imageUrl: chat.text ?? '',
             imageBuilder: (context, imageProvider) {
               return Container(
@@ -72,6 +65,13 @@ class ChatBubble extends StatelessWidget {
                   decoration: BoxDecoration(
                     image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
                   ));
+            },
+            placeholder: (context, _) {
+              return Container(
+                  width: 150,
+                  height: 150,
+                  alignment: Alignment.center,
+                  child: const CircularProgressIndicator());
             },
             errorWidget: (_, __, ___) {
               return Container(

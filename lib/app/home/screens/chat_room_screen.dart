@@ -41,6 +41,7 @@ class ChatRoomScreen extends StatelessWidget {
                                         shrinkWrap: true,
                                         padding: const EdgeInsets.only(top: 10),
                                         controller: ScrollController(),
+                                        cacheExtent: 100,
                                         itemCount: controller.chatList.length,
                                         itemBuilder: (context, index) {
                                           final senderUid = controller.chatList[index].senderUid;
@@ -72,8 +73,7 @@ class ChatRoomScreen extends StatelessWidget {
                                                                         fit: BoxFit.cover),
                                                                   ));
                                                             },
-                                                            progressIndicatorBuilder:
-                                                                (context, _, __) {
+                                                            placeholder: (context, _) {
                                                               return const SizedBox(
                                                                   width: 50,
                                                                   height: 50,

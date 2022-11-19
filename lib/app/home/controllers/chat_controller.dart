@@ -85,12 +85,16 @@ class ChatController extends GetxController {
     await imageRef.putFile(file);
     final imgUrl = await imageRef.getDownloadURL();
 
+    final bytes = await image.readAsBytes();
+    final imageByteSize = bytes.buffer.lengthInBytes;
+    const limitByteSize = 10485760;
+
     final chat = Chat(
         roomCode: roomCode,
         senderUid: auth.currentUser?.uid,
         sendMillisecondEpoch: DateTime.now().millisecondsSinceEpoch,
         text: imgUrl,
-        kind: SendKind.image,
+        kind: imageByteSize < limitByteSize ? SendKind.image : SendKind.file,
         fileName: image.name);
 
     db.collection(FirestoreCollection.chat).doc().set(chat.toFirestore()).then((_) {
