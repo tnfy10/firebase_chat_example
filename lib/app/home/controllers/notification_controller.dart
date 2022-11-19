@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_example/app/home/model/member.dart';
 import 'package:firebase_chat_example/const/prefs_key.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +15,6 @@ class NotificationController extends GetxController {
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  final service = FlutterBackgroundService();
 
   RxBool isAllowNotification = true.obs;
 
@@ -94,7 +92,7 @@ class NotificationController extends GetxController {
             notificationChannelId,
             '메시지 알림',
             icon: 'ic_bg_service_small',
-            ongoing: true,
+            importance: Importance.high,
           ),
         ),
       );
