@@ -38,16 +38,15 @@ class NotificationController extends GetxController {
 
   Future<void> allowNotificationToggle(bool value) async {
     final prefs = await SharedPreferences.getInstance();
+    isAllowNotification.value = value;
     if (value) {
       prefs.setBool(notificationKey, value);
-      isAllowNotification.value = value;
     } else {
       flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.requestPermission()
           .then((value) {
         prefs.setBool(notificationKey, value ?? false);
-        isAllowNotification.value = value ?? false;
       });
     }
   }
@@ -91,7 +90,7 @@ class NotificationController extends GetxController {
           android: AndroidNotificationDetails(
             notificationChannelId,
             '메시지 알림',
-            icon: 'ic_bg_service_small',
+            icon: 'ic_icon',
             importance: Importance.high,
           ),
         ),
