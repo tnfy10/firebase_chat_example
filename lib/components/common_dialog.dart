@@ -9,26 +9,32 @@ mixin CommonDialog {
       String buttonText = "확인",
       required Function() onPressed,
       bool barrierDismissible = true,
-      bool allowBackButton = true}) {
+      bool allowBackButton = true,
+      Function(dynamic)? completeCallback}) {
     showDialog(
-        context: context,
-        builder: (context) {
-          return WillPopScope(
-            onWillPop: () async {
-              return allowBackButton;
+            context: context,
+            builder: (context) {
+              return WillPopScope(
+                onWillPop: () async {
+                  return allowBackButton;
+                },
+                child: AlertDialog(
+                  backgroundColor: Theme.of(context).colorScheme.background,
+                  title: Text(
+                    title,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
+                  content: Text(content),
+                  actions: [TextButton(onPressed: onPressed, child: Text(buttonText))],
+                ),
+              );
             },
-            child: AlertDialog(
-              backgroundColor: Theme.of(context).colorScheme.background,
-              title: Text(
-                title,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              content: Text(content),
-              actions: [TextButton(onPressed: onPressed, child: Text(buttonText))],
-            ),
-          );
-        },
-        barrierDismissible: barrierDismissible);
+            barrierDismissible: barrierDismissible)
+        .then((value) {
+      if (completeCallback != null) {
+        completeCallback(value);
+      }
+    });
   }
 
   void showTwoButtonDialog(

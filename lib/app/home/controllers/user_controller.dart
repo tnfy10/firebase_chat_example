@@ -20,6 +20,7 @@ class UserController extends GetxController {
   Rx<Member> member = Member().obs;
   RxMap friendMap = <String, Member>{}.obs;
   RxBool isValidEmail = false.obs;
+  RxBool isLoading = false.obs;
 
   var errMsg = "";
 
@@ -127,7 +128,30 @@ class UserController extends GetxController {
     }
   }
 
-  void updatePassword() {}
+  void updatePassword(String oldPwd, String newPwd,
+      {required Function() onComplete, required Function(String) onError}) async {
+    isLoading.value = true;
+    try {
+      final credential = await auth.signInWithEmailAndPassword(
+        email: auth.currentUser!.email!,
+        password: oldPwd,
+      );
+      await credential.user?.updatePassword(newPwd);
+      onComplete();
+    } on FirebaseAuthException catch (e) {
+      debugPrint(e.toString());
+      if (e.code == 'wrong-password') {
+        onError('기존 비밀번호가 일치하지 않습니다.');
+      } else {
+        onError('비밀번호를 변경하는데 문제가 발생하였습니다.\n다시 시도해주세요.');
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      onError('비밀번호를 변경하는데 문제가 발생하였습니다.\n다시 시도해주세요.');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   void withdrawal() async {
     await auth.currentUser?.delete();

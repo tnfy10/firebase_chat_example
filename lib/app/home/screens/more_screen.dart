@@ -126,7 +126,7 @@ class MoreScreen extends StatelessWidget with CommonDialog {
                         title: const Text('비밀번호 설정', style: TextStyle(fontSize: 18)),
                         trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
-                          Get.to(() => const PasswordChangeScreen());
+                          Get.to(() => PasswordChangeScreen());
                         },
                       ),
                       const Divider(height: 1),
