@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_example/app/home/model/member.dart';
 import 'package:firebase_chat_example/const/prefs_key.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,14 +29,37 @@ class NotificationController extends GetxController {
   }
 
   void initAllowedNotification() async {
+    const initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+    const initializationSettingsDarwin = DarwinInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+    );
+    const initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsDarwin);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
     final prefs = await SharedPreferences.getInstance();
-    flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestPermission()
-        .then((value) {
-      prefs.setBool(notificationKey, value ?? false);
-      isAllowNotification.value = value ?? false;
-    });
+    if (Platform.isAndroid) {
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestPermission()
+          .then((value) {
+        prefs.setBool(notificationKey, value ?? false);
+        isAllowNotification.value = value ?? false;
+      });
+    } else if (Platform.isIOS) {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          )
+          .then((value) {
+        prefs.setBool(notificationKey, value ?? false);
+        isAllowNotification.value = value ?? false;
+      });
+    }
   }
 
   Future<void> allowNotificationToggle(bool value) async {
@@ -87,13 +113,12 @@ class NotificationController extends GetxController {
         member.nickname,
         chat.text,
         const NotificationDetails(
-          android: AndroidNotificationDetails(
-            notificationChannelId,
-            '메시지 알림',
-            icon: 'ic_icon',
-            importance: Importance.high,
-          ),
-        ),
+            android: AndroidNotificationDetails(
+          notificationChannelId,
+          '메시지 알림',
+          icon: 'ic_icon',
+          importance: Importance.high,
+        )),
       );
     });
   }
