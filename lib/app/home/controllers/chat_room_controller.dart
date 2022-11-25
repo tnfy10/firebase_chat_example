@@ -46,6 +46,7 @@ class ChatRoomController extends GetxController {
         throw ("ChatController::getChatRoomList::Current User uid is null.");
       } else {
         final uidList = [auth.currentUser!.uid, friendUid];
+        uidList.sort(); // 채팅방 중복 생성 방지용
         await fetchMemberList(uidList);
 
         final chatRoomRef = await db
@@ -73,6 +74,7 @@ class ChatRoomController extends GetxController {
     if (auth.currentUser?.uid == null) {
       completer.completeError("ChatController::createChatRoom::Current User uid is null.");
     } else {
+      uidList.sort(); // 채팅방 중복 생성 방지용
       var roomName = '';
 
       for (var i = 0; i < uidList.length; i++) {
