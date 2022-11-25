@@ -50,7 +50,7 @@ class ChatRoomController extends GetxController {
 
         final chatRoomRef = await db
             .collection(FirestoreCollection.chatRoom)
-            .where("uidList", arrayContainsAny: uidList)
+            .where("uidList", isEqualTo: uidList)
             .get();
 
         if (chatRoomRef.docs.isEmpty) {
