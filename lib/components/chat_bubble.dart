@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../app/home/model/chat.dart';
 
 class ChatBubble extends StatelessWidget {
-  final dateFormat = DateFormat('HH:mm');
+  final dateFormat = DateFormat('aa hh:mm');
   final Chat chat;
   final bool isMe;
 
@@ -55,31 +55,34 @@ class ChatBubble extends StatelessWidget {
   Widget chatContent(BuildContext context) {
     switch (chat.kind) {
       case SendKind.image:
-        return CachedNetworkImage(
-            imageUrl: chat.text ?? '',
-            imageBuilder: (context, imageProvider) {
-              return Container(
-                  margin: const EdgeInsets.all(10),
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                  ));
-            },
-            placeholder: (context, _) {
-              return Container(
-                  width: 150,
-                  height: 150,
-                  alignment: Alignment.center,
-                  child: const CircularProgressIndicator());
-            },
-            errorWidget: (_, __, ___) {
-              return Container(
-                  width: 150,
-                  height: 150,
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.error, size: 50));
-            });
+        return Hero(
+          tag: 'chat_image',
+          child: CachedNetworkImage(
+              imageUrl: chat.text ?? '',
+              imageBuilder: (context, imageProvider) {
+                return Container(
+                    margin: const EdgeInsets.all(10),
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                    ));
+              },
+              placeholder: (context, _) {
+                return Container(
+                    width: 150,
+                    height: 150,
+                    alignment: Alignment.center,
+                    child: const CircularProgressIndicator());
+              },
+              errorWidget: (_, __, ___) {
+                return Container(
+                    width: 150,
+                    height: 150,
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.error, size: 50));
+              }),
+        );
       case SendKind.file:
         return Padding(
           padding: const EdgeInsets.all(8.0),
