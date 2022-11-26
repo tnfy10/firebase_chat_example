@@ -15,6 +15,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../themes/color_scheme.dart';
 import '../model/chat.dart';
+import '../model/image_data.dart';
 import '../model/member.dart';
 
 String currentRoomCode = '';
@@ -194,5 +195,19 @@ class ChatController extends GetxController {
       debugPrint('ChatController::sendFile::error:${e.toString()}');
       Get.snackbar('파일 전송 실패', result.files.single.name);
     });
+  }
+
+  Future<ImageData> getImageData(String imgUrl) async {
+    isLoading.value = true;
+    final ref = FirebaseStorage.instance.refFromURL(imgUrl);
+    final metadata = await ref.getMetadata();
+    final mByteValue = (metadata.size! / 1024 / 1024).toStringAsFixed(2);
+    final data = await ref.getData();
+    final image = await decodeImageFromList(data!);
+    isLoading.value = false;
+    return ImageData(
+        kind: metadata.contentType!,
+        mByteValue: '${mByteValue}MB',
+        resolution: '${image.width}X${image.height}');
   }
 }

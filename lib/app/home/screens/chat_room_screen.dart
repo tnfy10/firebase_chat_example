@@ -107,12 +107,7 @@ class ChatRoomScreen extends StatelessWidget with CommonDialog {
                       onTap: () {
                         switch (chatController.chatList[index].kind) {
                           case SendKind.image:
-                            Get.to(() => ImageViewerScreen(
-                                fileName: chatController.chatList[index].fileName!,
-                                imgUrl: chatController.chatList[index].text!,
-                                senderName: chatController.memberMap[senderUid]!.nickname!,
-                                sendDateMsEpoch:
-                                    chatController.chatList[index].sendMillisecondEpoch!));
+                            Get.to(() => ImageViewerScreen(index: index));
                             break;
                           case SendKind.file:
                             showTwoButtonDialog(
