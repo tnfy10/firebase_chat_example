@@ -50,23 +50,24 @@ class ImageViewerScreen extends StatelessWidget {
               child: Center(
             child: Hero(
               tag: fileName,
-              child: CachedNetworkImage(
-                  imageUrl: imgUrl,
-                  imageBuilder: (context, imageProvider) {
-                    return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(image: imageProvider, fit: BoxFit.fitWidth),
-                        ));
-                  },
-                  placeholder: (context, _) {
-                    return Container(
-                        width: 30,
-                        height: 30,
-                        alignment: Alignment.center,
-                        child: const CircularProgressIndicator());
-                  }),
+              child: InteractiveViewer(
+                child: CachedNetworkImage(
+                    imageUrl: imgUrl,
+                    imageBuilder: (context, imageProvider) {
+                      return Container(
+                          margin: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            image: DecorationImage(image: imageProvider, fit: BoxFit.contain),
+                          ));
+                    },
+                    placeholder: (context, _) {
+                      return Container(
+                          width: 30,
+                          height: 30,
+                          alignment: Alignment.center,
+                          child: const CircularProgressIndicator());
+                    }),
+              ),
             ),
           )),
           GestureDetector(

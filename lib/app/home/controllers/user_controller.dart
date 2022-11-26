@@ -132,7 +132,7 @@ class UserController extends GetxController {
       }
 
       final imageRef = storageRef.child('profileImg/${auth.currentUser!.uid}');
-      File file = File(croppedFile!.path);
+      File file = File(croppedFile.path);
       await imageRef.putFile(file);
       final imgUrl = await imageRef.getDownloadURL();
       final memberRef = db.collection(FirestoreCollection.member).doc(auth.currentUser!.uid);
