@@ -31,6 +31,7 @@ class ChatRoomScreen extends StatelessWidget with CommonDialog {
         child: Scaffold(
             appBar: AppBar(
               title: const Text('채팅방'),
+              centerTitle: true,
             ),
             body: SafeArea(
               child: Column(

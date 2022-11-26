@@ -15,6 +15,7 @@ class ChatRoomListScreen extends StatelessWidget {
             backgroundColor: Theme.of(context).colorScheme.background,
             appBar: AppBar(
               title: const Text('채팅'),
+              centerTitle: true,
               surfaceTintColor: Theme.of(context).colorScheme.background,
             ),
             body: SafeArea(

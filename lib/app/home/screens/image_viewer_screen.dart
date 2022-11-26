@@ -24,6 +24,7 @@ class ImageViewerScreen extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF222222),
+        centerTitle: false,
         leading: IconButton(
             onPressed: () {
               Get.back();
@@ -44,50 +45,51 @@ class ImageViewerScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-              child: Center(
-            child: Hero(
-              tag: fileName,
-              child: InteractiveViewer(
-                child: CachedNetworkImage(
-                    imageUrl: imgUrl,
-                    imageBuilder: (context, imageProvider) {
-                      return Container(
-                          margin: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            image: DecorationImage(image: imageProvider, fit: BoxFit.contain),
-                          ));
-                    },
-                    placeholder: (context, _) {
-                      return Container(
-                          width: 30,
-                          height: 30,
-                          alignment: Alignment.center,
-                          child: const CircularProgressIndicator());
-                    }),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+                child: Center(
+              child: Hero(
+                tag: fileName,
+                child: InteractiveViewer(
+                  child: CachedNetworkImage(
+                      imageUrl: imgUrl,
+                      imageBuilder: (context, imageProvider) {
+                        return Container(
+                            margin: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              image: DecorationImage(image: imageProvider, fit: BoxFit.contain),
+                            ));
+                      },
+                      placeholder: (context, _) {
+                        return Container(
+                            width: 30,
+                            height: 30,
+                            alignment: Alignment.center,
+                            child: const CircularProgressIndicator());
+                      }),
+                ),
               ),
-            ),
-          )),
-          GestureDetector(
-            onTap: () {
-              Get.snackbar('다운로드 시작', fileName,
-                  colorText: Colors.black, backgroundColor: const Color(0xB3D5D5D5));
-              DownloadUtil.downloadFile(imgUrl, fileName).then((_) {
-                Get.snackbar('다운로드 완료', fileName,
+            )),
+            GestureDetector(
+              onTap: () {
+                Get.snackbar('다운로드 시작', fileName,
                     colorText: Colors.black, backgroundColor: const Color(0xB3D5D5D5));
-              });
-            },
-            child: Container(
-              color: const Color(0xFF222222),
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              alignment: Alignment.center,
-              child: const Text('다운로드', style: TextStyle(color: Colors.white, fontSize: 16)),
-            ),
-          )
-        ],
+                DownloadUtil.downloadFile(imgUrl, fileName).then((_) {
+                  Get.snackbar('다운로드 완료', fileName,
+                      colorText: Colors.black, backgroundColor: const Color(0xB3D5D5D5));
+                });
+              },
+              child: Container(
+                color: const Color(0xFF222222),
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                alignment: Alignment.center,
+                child: const Text('다운로드', style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

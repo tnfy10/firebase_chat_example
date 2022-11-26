@@ -20,6 +20,7 @@ class MoreScreen extends StatelessWidget with CommonDialog {
         backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(
           title: const Text('설정'),
+          centerTitle: true,
         ),
         body: SafeArea(
           child: Obx(() => Column(

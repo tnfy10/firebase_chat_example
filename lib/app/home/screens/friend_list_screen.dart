@@ -19,6 +19,7 @@ class FriendListScreen extends StatelessWidget with CommonDialog {
             backgroundColor: Theme.of(context).colorScheme.background,
             appBar: AppBar(
               title: const Text('친구목록'),
+              centerTitle: true,
               surfaceTintColor: Theme.of(context).colorScheme.background,
               actions: [
                 IconButton(
