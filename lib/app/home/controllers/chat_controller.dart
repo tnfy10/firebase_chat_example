@@ -9,10 +9,12 @@ import 'package:firebase_chat_example/utils/converter.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../themes/color_scheme.dart';
 import '../model/chat.dart';
 import '../model/member.dart';
 
@@ -89,19 +91,48 @@ class ChatController extends GetxController {
     final storageRef = FirebaseStorage.instance.ref();
 
     if (image?.path == null) {
-      debugPrint('ChatController::sendImage::이미지 경로가 null임.');
+      debugPrint('ChatController::sendImage::이미지 선택이 취소됨.');
       return;
     }
 
-    Get.snackbar('이미지 전송 중', image!.name);
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: image!.path,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarTitle: '자르기',
+            toolbarColor: lightColorScheme.primaryContainer,
+            toolbarWidgetColor: lightColorScheme.primary,
+            backgroundColor: lightColorScheme.surfaceVariant,
+            activeControlsWidgetColor: lightColorScheme.primary,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        IOSUiSettings(
+          title: '자르기',
+        )
+      ],
+    );
+
+    if (croppedFile == null) {
+      debugPrint('ChatController::sendImage::자르기가 취소됨.');
+      return;
+    }
+
+    Get.snackbar('이미지 전송 중', image.name);
 
     const uuid = Uuid();
     final imageRef = storageRef.child('$roomCode/${uuid.v1()}');
-    File file = File(image.path);
+    File file = File(croppedFile.path);
     await imageRef.putFile(file);
     final imgUrl = await imageRef.getDownloadURL();
 
-    final bytes = await image.readAsBytes();
+    final bytes = await croppedFile.readAsBytes();
     final imageByteSize = bytes.buffer.lengthInBytes;
     const limitByteSize = 10485760;
 
