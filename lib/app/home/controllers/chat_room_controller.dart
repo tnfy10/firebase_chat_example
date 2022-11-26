@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_example/const/firestore_collection.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 
@@ -46,13 +48,18 @@ class ChatRoomController extends GetxController {
         throw ("ChatController::getChatRoomList::Current User uid is null.");
       } else {
         final uidList = [auth.currentUser!.uid, friendUid];
-        uidList.sort(); // 채팅방 중복 생성 방지용
         await fetchMemberList(uidList);
 
+        uidList.sort();
         final chatRoomRef = await db
             .collection(FirestoreCollection.chatRoom)
-            .where("uidList", isEqualTo: uidList)
+            .where("uidList", arrayContains: auth.currentUser!.uid)
+            .where("uidList", whereIn: [uidList])
             .get();
+
+        for (var element in chatRoomRef.docs) {
+          debugPrint(jsonEncode(element.data()));
+        }
 
         if (chatRoomRef.docs.isEmpty) {
           final roomCode = await _createOneOnOneChatRoom(uidList);
@@ -74,7 +81,6 @@ class ChatRoomController extends GetxController {
     if (auth.currentUser?.uid == null) {
       completer.completeError("ChatController::createChatRoom::Current User uid is null.");
     } else {
-      uidList.sort(); // 채팅방 중복 생성 방지용
       var roomName = '';
 
       for (var i = 0; i < uidList.length; i++) {
@@ -84,6 +90,7 @@ class ChatRoomController extends GetxController {
         }
       }
 
+      uidList.sort();
       final chatRoom = ChatRoom(roomName: roomName, recentMsg: '', uidList: uidList);
       final uuid = const Uuid().v1();
 
