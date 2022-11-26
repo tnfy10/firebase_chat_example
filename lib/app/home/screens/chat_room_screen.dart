@@ -2,13 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_chat_example/app/home/model/chat.dart';
 import 'package:firebase_chat_example/app/home/screens/image_viewer_screen.dart';
 import 'package:firebase_chat_example/components/chat_bubble.dart';
+import 'package:firebase_chat_example/components/common_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../utils/download_util.dart';
 import '../controllers/chat_controller.dart';
 
-class ChatRoomScreen extends StatelessWidget {
+class ChatRoomScreen extends StatelessWidget with CommonDialog {
   final chatController = Get.find<ChatController>();
   final messageController = TextEditingController();
   final textFieldFocus = FocusNode();
@@ -113,12 +114,24 @@ class ChatRoomScreen extends StatelessWidget {
                                     chatController.chatList[index].sendMillisecondEpoch!));
                             break;
                           case SendKind.file:
-                            Get.snackbar('다운로드 시작', chatController.chatList[index].fileName!);
-                            DownloadUtil.downloadFile(chatController.chatList[index].text,
-                                    chatController.chatList[index].fileName)
-                                .then((_) {
-                              Get.snackbar('다운로드 완료', chatController.chatList[index].fileName!);
-                            });
+                            showTwoButtonDialog(
+                                context: context,
+                                title: '안내',
+                                content:
+                                    '${chatController.chatList[index].fileName}\n\n해당 파일을 다운로드 하시겠습니까?',
+                                onTapNegativeBtn: () {
+                                  Get.back();
+                                },
+                                onTapPositiveBtn: () {
+                                  Get.back();
+                                  Get.snackbar('다운로드 시작', chatController.chatList[index].fileName!);
+                                  DownloadUtil.downloadFile(chatController.chatList[index].text,
+                                          chatController.chatList[index].fileName)
+                                      .then((_) {
+                                    Get.snackbar(
+                                        '다운로드 완료', chatController.chatList[index].fileName!);
+                                  });
+                                });
                             break;
                           default:
                             break;
