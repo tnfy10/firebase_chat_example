@@ -56,7 +56,7 @@ class ChatBubble extends StatelessWidget {
     switch (chat.kind) {
       case SendKind.image:
         return Hero(
-          tag: 'chat_image',
+          tag: chat.fileName!,
           child: CachedNetworkImage(
               imageUrl: chat.text ?? '',
               imageBuilder: (context, imageProvider) {

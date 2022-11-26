@@ -49,7 +49,7 @@ class ImageViewerScreen extends StatelessWidget {
           Expanded(
               child: Center(
             child: Hero(
-              tag: 'chat_image',
+              tag: fileName,
               child: CachedNetworkImage(
                   imageUrl: imgUrl,
                   imageBuilder: (context, imageProvider) {
