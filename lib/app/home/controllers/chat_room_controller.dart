@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_chat_example/const/firestore_collection.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 
