@@ -149,6 +149,14 @@ class MoreScreen extends StatelessWidget with CommonDialog {
                         },
                       ),
                       const Divider(height: 1),
+                      ListTile(
+                        title: const Text('로그아웃', style: TextStyle(fontSize: 18)),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          userController.logout();
+                        },
+                      ),
+                      const Divider(height: 1),
                     ],
                   )
                 ],

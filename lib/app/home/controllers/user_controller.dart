@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -187,8 +188,11 @@ class UserController extends GetxController {
 
   void withdrawal() async {
     await auth.currentUser?.delete();
-    auth.signOut().then((_) {
-      Get.offAll(LoginScreen(), binding: LoginBinding());
-    });
+    logout();
+  }
+
+  void logout() async {
+    await auth.signOut();
+    Get.offAll(LoginScreen(), binding: LoginBinding());
   }
 }
