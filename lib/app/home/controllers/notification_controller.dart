@@ -28,7 +28,7 @@ class NotificationController extends GetxController {
   }
 
   void initAllowedNotification() async {
-    const initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+    const initializationSettingsAndroid = AndroidInitializationSettings('ic_icon');
     const initializationSettingsDarwin = DarwinInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
@@ -94,7 +94,16 @@ class NotificationController extends GetxController {
           for (var item in event.docChanges) {
             if (item.type == DocumentChangeType.added) {
               final chat = Chat.fromFirestore(item.doc);
-              if (chat.senderUid != auth.currentUser?.uid && currentRoomCode != chat.roomCode) {
+              final chatDate = DateTime.fromMillisecondsSinceEpoch(chat.sendMillisecondEpoch ?? 0);
+              final nowDate = DateTime.now();
+              final minDate = DateTime(
+                  nowDate.year, nowDate.month, nowDate.day, nowDate.hour, nowDate.minute, nowDate.second - 1);
+              final maxDate = DateTime(
+                  nowDate.year, nowDate.month, nowDate.day, nowDate.hour, nowDate.minute, nowDate.second + 1);
+              if (chat.senderUid != auth.currentUser?.uid &&
+                  currentRoomCode != chat.roomCode &&
+                  chatDate.isAfter(minDate) &&
+                  chatDate.isBefore(maxDate)) {
                 pushNotification(chat);
               }
             }

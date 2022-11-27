@@ -57,10 +57,6 @@ class ChatRoomController extends GetxController {
             .where("uidList", whereIn: [uidList])
             .get();
 
-        for (var element in chatRoomRef.docs) {
-          debugPrint(jsonEncode(element.data()));
-        }
-
         if (chatRoomRef.docs.isEmpty) {
           final roomCode = await _createOneOnOneChatRoom(uidList);
           completer.complete(roomCode);
