@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 import 'chat_room_list_screen.dart';
@@ -17,8 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int currentScreenIdx = 0;
 
-  List<Widget> screens() =>
-      [FriendListScreen(), const ChatRoomListScreen(), MoreScreen()];
+  List<Widget> screens() => [FriendListScreen(), const ChatRoomListScreen(), MoreScreen()];
 
   List<PersistentBottomNavBarItem> bottomNavBarItemList(BuildContext context) => [
         PersistentBottomNavBarItem(
@@ -40,37 +40,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Theme.of(context).colorScheme.background,
-        body: SafeArea(
-            child: PersistentTabView(
-          context,
-          controller: _tabViewController,
-          screens: screens(),
-          items: bottomNavBarItemList(context),
-          confineInSafeArea: true,
-          backgroundColor: Theme.of(context).colorScheme.background,
-          handleAndroidBackButtonPress: true,
+    return WillPopScope(
+      onWillPop: () async {
+        SystemNavigator.pop();
+        return false;
+      },
+      child: Scaffold(
           resizeToAvoidBottomInset: false,
-          stateManagement: true,
-          hideNavigationBarWhenKeyboardShows: true,
-          decoration: NavBarDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            colorBehindNavBar: Theme.of(context).colorScheme.background,
-          ),
-          popAllScreensOnTapOfSelectedTab: true,
-          popActionScreens: PopActionScreensType.all,
-          itemAnimationProperties: const ItemAnimationProperties(
-            duration: Duration(milliseconds: 200),
-            curve: Curves.ease,
-          ),
-          screenTransitionAnimation: const ScreenTransitionAnimation(
-            animateTabTransition: true,
-            curve: Curves.ease,
-            duration: Duration(milliseconds: 200),
-          ),
-          navBarStyle: NavBarStyle.style9,
-        )));
+          backgroundColor: Theme.of(context).colorScheme.background,
+          body: PersistentTabView(
+            context,
+            controller: _tabViewController,
+            screens: screens(),
+            items: bottomNavBarItemList(context),
+            backgroundColor: Theme.of(context).colorScheme.background,
+            itemAnimationProperties: const ItemAnimationProperties(
+              duration: Duration(milliseconds: 200),
+              curve: Curves.ease,
+            ),
+            screenTransitionAnimation: const ScreenTransitionAnimation(
+              animateTabTransition: true,
+              curve: Curves.ease,
+              duration: Duration(milliseconds: 200),
+            ),
+            navBarStyle: NavBarStyle.style6,
+          )),
+    );
   }
 }

@@ -47,16 +47,16 @@ class MoreScreen extends StatelessWidget with CommonDialog {
                     ),
                     title: Text(userController.member.value.nickname ?? ''),
                     subtitle: Text(userController.member.value.statusMessage ?? ''),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                   ),
                   ListView(
                     shrinkWrap: true,
-                    padding: const EdgeInsets.only(top: 20),
+                    padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       const Divider(height: 1),
                       ListTile(
                         title: const Text('프로필 이미지 변경', style: TextStyle(fontSize: 18)),
-                        trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           userController.updateProfileImage();
                         },
@@ -64,7 +64,6 @@ class MoreScreen extends StatelessWidget with CommonDialog {
                       const Divider(height: 1),
                       ListTile(
                         title: const Text('닉네임 변경', style: TextStyle(fontSize: 18)),
-                        trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           final nicknameController = TextEditingController();
                           final key = GlobalKey<FormState>();
@@ -93,7 +92,6 @@ class MoreScreen extends StatelessWidget with CommonDialog {
                       const Divider(height: 1),
                       ListTile(
                         title: const Text('상태 메시지 변경', style: TextStyle(fontSize: 18)),
-                        trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           final statusMsgController = TextEditingController();
                           showTextFormFieldDialog(
@@ -125,7 +123,6 @@ class MoreScreen extends StatelessWidget with CommonDialog {
                       const Divider(height: 1),
                       ListTile(
                         title: const Text('비밀번호 설정', style: TextStyle(fontSize: 18)),
-                        trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           Get.to(() => PasswordChangeScreen());
                         },
@@ -133,7 +130,6 @@ class MoreScreen extends StatelessWidget with CommonDialog {
                       const Divider(height: 1),
                       ListTile(
                         title: const Text('회원탈퇴', style: TextStyle(fontSize: 18)),
-                        trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           showTwoButtonDialog(
                               context: context,
@@ -151,7 +147,6 @@ class MoreScreen extends StatelessWidget with CommonDialog {
                       const Divider(height: 1),
                       ListTile(
                         title: const Text('로그아웃', style: TextStyle(fontSize: 18)),
-                        trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           userController.logout();
                         },

@@ -16,113 +16,104 @@ class LoginScreen extends StatelessWidget with CommonDialog {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Theme.of(context).colorScheme.background,
-        body: SafeArea(
-          child: Obx(
-            () => IgnorePointer(
-              ignoring: loginController.isLoading.value,
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 50),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Expanded(
-                            child: Column(
-                              children: [
-                                Image.asset(
-                                  "assets/images/ic_icon_none_background.png",
-                                  width: 100,
-                                  height: 100,
-                                ),
-                                const SizedBox(height: 50),
-                                TextField(
-                                  onChanged: ((value) {
-                                    loginController.email = value;
-                                  }),
-                                  decoration: const InputDecoration(
-                                    labelText: '이메일',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  keyboardType: TextInputType.emailAddress,
-                                  textInputAction: TextInputAction.next,
-                                ),
-                                const SizedBox(height: 20),
-                                TextField(
-                                  onChanged: ((value) {
-                                    loginController.password.value = value;
-                                  }),
-                                  decoration: InputDecoration(
-                                      labelText: '비밀번호',
-                                      border: const OutlineInputBorder(),
-                                      suffixIcon: IconButton(
-                                          iconSize: 20,
-                                          highlightColor: Colors.transparent,
-                                          onPressed: () {
-                                            loginController
-                                                .changePasswordVisibility();
-                                          },
-                                          icon: Icon(loginController
-                                                  .password.value.isNotEmpty
-                                              ? loginController
-                                                      .isPasswordVisible.value
-                                                  ? Icons.visibility_off
-                                                  : Icons.visibility
-                                              : null))),
-                                  obscureText:
-                                      !loginController.isPasswordVisible.value,
-                                  keyboardType: TextInputType.text,
-                                  textInputAction: TextInputAction.done,
-                                  onSubmitted: (_) => _loginButton(context),
-                                ),
-                                const SizedBox(height: 30),
-                                ElevatedButton(
-                                    onPressed: () => _loginButton(context),
-                                    style: ElevatedButton.styleFrom(
-                                        fixedSize: Size(
-                                            MediaQuery.of(context).size.width, 50)),
-                                    child: const Text('로그인')),
-                                const SizedBox(height: 15),
-                                TextButton(
-                                  onPressed: () {
-                                    Get.to(() => SignUpScreen(),
-                                        binding: SignUpBinding());
-                                  },
-                                  child: const Text(
-                                    "회원가입",
-                                    style: TextStyle(
-                                        decoration: TextDecoration.underline),
-                                  ),
-                                )
-                              ],
-                        )),
-                        TextButton(
-                          onPressed: () {
-                            Get.to(() => FindPasswordScreen());
-                          },
-                          child: const Text("비밀번호를 잊으셨나요?"),
-                        )
-                      ],
-                    ),
+    return Obx(
+      () => Stack(
+        children: [
+          IgnorePointer(
+            ignoring: loginController.isLoading.value,
+            child: Scaffold(
+                resizeToAvoidBottomInset: false,
+                backgroundColor: Theme.of(context).colorScheme.background,
+                body: SafeArea(
+                    child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 50),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Expanded(
+                          child: Column(
+                        children: [
+                          Image.asset(
+                            "assets/images/ic_icon_none_background.png",
+                            width: 100,
+                            height: 100,
+                          ),
+                          const SizedBox(height: 50),
+                          TextField(
+                            onChanged: ((value) {
+                              loginController.email = value;
+                            }),
+                            decoration: const InputDecoration(
+                              labelText: '이메일',
+                              border: OutlineInputBorder(),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                          ),
+                          const SizedBox(height: 20),
+                          TextField(
+                            onChanged: ((value) {
+                              loginController.password.value = value;
+                            }),
+                            decoration: InputDecoration(
+                                labelText: '비밀번호',
+                                border: const OutlineInputBorder(),
+                                suffixIcon: IconButton(
+                                    iconSize: 20,
+                                    highlightColor: Colors.transparent,
+                                    onPressed: () {
+                                      loginController.changePasswordVisibility();
+                                    },
+                                    icon: Icon(loginController.password.value.isNotEmpty
+                                        ? loginController.isPasswordVisible.value
+                                            ? Icons.visibility_off
+                                            : Icons.visibility
+                                        : null))),
+                            obscureText: !loginController.isPasswordVisible.value,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.done,
+                            onSubmitted: (_) => _loginButton(context),
+                          ),
+                          const SizedBox(height: 30),
+                          ElevatedButton(
+                              onPressed: () => _loginButton(context),
+                              style: ElevatedButton.styleFrom(
+                                  fixedSize: Size(MediaQuery.of(context).size.width, 50)),
+                              child: const Text('로그인')),
+                          const SizedBox(height: 15),
+                          TextButton(
+                            onPressed: () {
+                              Get.to(() => SignUpScreen(), binding: SignUpBinding());
+                            },
+                            child: const Text(
+                              "회원가입",
+                              style: TextStyle(decoration: TextDecoration.underline),
+                            ),
+                          )
+                        ],
+                      )),
+                      TextButton(
+                        onPressed: () {
+                          Get.to(() => FindPasswordScreen());
+                        },
+                        child: const Text("비밀번호를 잊으셨나요?"),
+                      )
+                    ],
                   ),
-                  Positioned(
-                      child: loginController.isLoading.value
-                          ? Container(
-                              alignment: Alignment.center,
-                              decoration:
-                                  const BoxDecoration(color: Colors.black12),
-                              child: const CircularProgressIndicator(),
-                            )
-                          : const SizedBox())
-                ],
-              ),
-            ),
+                ))),
           ),
-        ));
+          loginController.isLoading.value
+              ? Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(color: Colors.black12),
+                  child: const CircularProgressIndicator(),
+                )
+              : const SizedBox()
+        ],
+      ),
+    );
   }
 
   void _loginButton(BuildContext context) {
