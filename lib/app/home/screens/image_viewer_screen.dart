@@ -15,10 +15,12 @@ class ImageViewerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetX<ChatController>(
       builder: (controller) {
-        final nickname = controller.memberMap[controller.chatList[index].senderUid!]!.nickname!;
-        final fileName = controller.chatList[index].fileName!;
-        final imgUrl = controller.chatList[index].text!;
-        final msEpoch = controller.chatList[index].sendMillisecondEpoch!;
+        final senderUid = controller.chatList[index].senderUid ?? '';
+        final nickname = controller.memberMap[senderUid]?.nickname ?? '';
+        final fileName = controller.chatList[index].fileName ?? '';
+        final imgUrl = controller.chatList[index].text ?? '';
+        final msEpoch = controller.chatList[index].sendMillisecondEpoch ??
+            DateTime.now().millisecondsSinceEpoch;
 
         return IgnorePointer(
           ignoring: controller.isLoading.value,
@@ -110,7 +112,7 @@ class ImageViewerScreen extends StatelessWidget {
                                       backgroundColor: Colors.black54,
                                       shape: const Border(),
                                       child: GridView.count(
-                                        padding: const EdgeInsets.only(top: 15, left: 15),
+                                        padding: const EdgeInsets.all(15),
                                         shrinkWrap: true,
                                         physics: const NeverScrollableScrollPhysics(),
                                         crossAxisCount: 2,

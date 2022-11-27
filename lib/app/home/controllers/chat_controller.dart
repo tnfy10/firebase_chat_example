@@ -201,7 +201,8 @@ class ChatController extends GetxController {
     isLoading.value = true;
     final ref = FirebaseStorage.instance.refFromURL(imgUrl);
     final metadata = await ref.getMetadata();
-    final mByteValue = (metadata.size! / 1024 / 1024).toStringAsFixed(2);
+    final mByteValue =
+        metadata.size != null ? (metadata.size! / 1024 / 1024).toStringAsFixed(2) : 0;
     final data = await ref.getData();
     final image = await decodeImageFromList(data!);
     isLoading.value = false;
